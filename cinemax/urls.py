@@ -15,8 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('', include('cinemaxpr.urls')),
+    path('login', views.login, name='login'),
+    path('logout', views.logoutUser, name='logout'),
+    path('admindashboard', views.adminDashboard, name='admindashboard'),
+    path('adduser', views.addUser, name='adduser'),
+    path('manageusers', views.manageUsers, name='manageusers'),
     path('admin/', admin.site.urls),
 ]
