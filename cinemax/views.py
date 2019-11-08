@@ -23,7 +23,7 @@ def login(request):
             if user.is_superuser:
                 return redirect('admindashboard')
             else:
-                return redirect('/')
+                return redirect('dashboard')
         else:
             return render(request, 'account/login.htm', {'error' : 'Invalid Login credentials!'})
     else:

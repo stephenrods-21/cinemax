@@ -91,10 +91,10 @@
     <div id="sidebar" class="sidebar py-3">
       <div class="text-gray-400 text-uppercase px-3 px-lg-4 py-4 font-weight-bold small headings-font-family">MAIN</div>
       <ul class="sidebar-menu list-unstyled">
-        <li class="sidebar-list-item"><a href="{% url 'admindashboard' %}"
+        <li class="sidebar-list-item"><a href="{% url 'dashboard' %}"
             class="sidebar-link text-muted {% if view == 'dashboard' %} active {% endif %}"><i
               class="o-home-1 mr-3 text-gray"></i><span>Dashboard</span></a></li>
-        <li class="sidebar-list-item"><a href="{% url 'manageusers' %}"
+        <li class="sidebar-list-item"><a href="{% url 'memo' %}"
             class="sidebar-link text-muted {% if view == 'memo' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Memo</span></a></li>
         <!-- <li class="sidebar-list-item"><a href="tables.html" class="sidebar-link text-muted"><i class="o-table-content-1 mr-3 text-gray"></i><span>Tables</span></a></li>
