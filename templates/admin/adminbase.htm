@@ -35,7 +35,7 @@
   <header class="header">
     <nav class="navbar navbar-expand-lg px-4 py-2 bg-white shadow"><a href="#"
         class="sidebar-toggler text-gray-500 mr-4 mr-lg-5 lead"><i class="fas fa-align-left"></i></a><a href="#"
-        class="navbar-brand font-weight-bold text-uppercase text-base">Dashboard</a>
+        class="navbar-brand font-weight-bold text-uppercase text-base">{{title}}</a>
       <ul class="ml-auto d-flex align-items-center list-unstyled mb-0">
         <!-- <li class="nav-item">
             <form id="searchForm" class="ml-auto d-none d-lg-block">
@@ -79,7 +79,8 @@
               src="{% static 'admin/img/admin-avatar.jpg' %}" alt="User" style="max-width: 2.5rem;"
               class="img-fluid rounded-circle shadow"></a>
           <div aria-labelledby="userInfo" class="dropdown-menu"><a href="#" class="dropdown-item"><strong
-                class="d-block text-uppercase headings-font-family">{{user.username}}</strong><small>{% if user.is_superuser == 1 %} Admin {% else %} Manager {% endif %}</small></a>
+                class="d-block text-uppercase headings-font-family">{{user.username}}</strong><small>{% if user.is_superuser == 1 %}
+                Admin {% else %} Manager {% endif %}</small></a>
             <!-- <div class="dropdown-divider"></div><a href="#" class="dropdown-item">Settings</a><a href="#" class="dropdown-item">Activity log       </a> -->
             <div class="dropdown-divider"></div><a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
           </div>
@@ -97,6 +98,12 @@
         <li class="sidebar-list-item"><a href="{% url 'manageusers' %}"
             class="sidebar-link text-muted {% if view == 'manageusers' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Manage Users</span></a></li>
+        <li class="sidebar-list-item"><a href="{% url 'businessunits' %}"
+            class="sidebar-link text-muted {% if view == 'businessunits' %} active {% endif %}"><i
+              class="o-sales-up-1 mr-3 text-gray"></i><span>Business Units</span></a></li>
+              <li class="sidebar-list-item"><a href="{% url 'lineofapproval' %}"
+                class="sidebar-link text-muted {% if view == 'lineofapproval' %} active {% endif %}"><i
+                  class="o-sales-up-1 mr-3 text-gray"></i><span>Line Of Approval</span></a></li>
         <!-- <li class="sidebar-list-item"><a href="tables.html" class="sidebar-link text-muted"><i class="o-table-content-1 mr-3 text-gray"></i><span>Tables</span></a></li>
               <li class="sidebar-list-item"><a href="forms.html" class="sidebar-link text-muted"><i class="o-survey-1 mr-3 text-gray"></i><span>Forms</span></a></li> -->
         <!-- <li class="sidebar-list-item"><a href="#" data-toggle="collapse" data-target="#pages" aria-expanded="false" aria-controls="pages" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Pages</span></a>
@@ -128,18 +135,18 @@
         </section>
       </div>
       <footer class="footer bg-white shadow align-self-end py-3 px-xl-5 w-100">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-md-6 text-center text-md-left text-primary">
-                <p class="mb-2 mb-md-0">CINEMAX PR &copy; 2019-2020</p>
-              </div>
-              <div class="col-md-6 text-center text-md-right text-gray-400">
-                <!-- <p class="mb-0">Design by <a href="https://bootstrapious.com/admin-templates" class="external text-gray-400">Bootstrapious</a></p> -->
-                <!-- Please do not remove the backlink to us unless you support further theme's development at https://bootstrapious.com/donate. It is part of the license conditions. Thank you for understanding :)-->
-              </div>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-6 text-center text-md-left text-primary">
+              <p class="mb-2 mb-md-0">CINEMAX PR &copy; 2019-2020</p>
+            </div>
+            <div class="col-md-6 text-center text-md-right text-gray-400">
+              <!-- <p class="mb-0">Design by <a href="https://bootstrapious.com/admin-templates" class="external text-gray-400">Bootstrapious</a></p> -->
+              <!-- Please do not remove the backlink to us unless you support further theme's development at https://bootstrapious.com/donate. It is part of the license conditions. Thank you for understanding :)-->
             </div>
           </div>
-        </footer>
+        </div>
+      </footer>
     </div>
   </div>
 

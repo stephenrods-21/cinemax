@@ -24,5 +24,8 @@ urlpatterns = [
     path('admindashboard', views.adminDashboard, name='admindashboard'),
     path('adduser', views.addUser, name='adduser'),
     path('manageusers', views.manageUsers, name='manageusers'),
+    path('addbusinessunit', views.addBusinessUnit, name='addbusinessunit'),
+    path('businessunits', views.businessunits, name='businessunits'),
+    path('lineofapproval', views.lineOfApproval, name='lineofapproval'),
     path('admin/', admin.site.urls),
 ]

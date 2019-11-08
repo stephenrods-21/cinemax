@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
+from cinemaxpr.models import businessunit
 
 
 def check_access(user):
@@ -45,10 +46,23 @@ def logoutUser(request):
 
 @user_passes_test(check_access)
 def adminDashboard(request):
-    return render(request, 'admin/admindashboard.htm', {'view':'dashboard'})
+    return render(request, 'admin/admindashboard.htm', {'view':'dashboard', 'title': 'Dashboard'})
 
 @user_passes_test(check_access)
 def manageUsers(request):
     users = User.objects.all()
-    return render(request, 'admin/manageusers.htm', {'view':'manageusers', 'users': users})
+    return render(request, 'admin/manageusers.htm', {'view':'manageusers', 'title': 'Manage Users', 'users': users})
 
+@user_passes_test(check_access)
+def businessunits(request):
+    return render(request, 'admin/businessunit.htm', {'view':'businessunits', 'title': 'Business Unit', 'businessunits' : businessunit.objects.all()})
+
+@user_passes_test(check_access)
+def addBusinessUnit(request):
+    bu = businessunit(name=request.POST['name'], prefix=request.POST['prefix'], created_by_id=request.user.id)
+    bu.save()
+    return redirect('businessunits')
+
+@user_passes_test(check_access)
+def lineOfApproval(request):
+    return redirect('businessunits')
