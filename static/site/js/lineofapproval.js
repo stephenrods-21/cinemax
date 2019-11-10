@@ -1,16 +1,16 @@
 $(document).ready(() => {
-
-    $(document).on('change', '#Approvers', (e) => {
-
+    var i = 0;
+    $(document).on('click', '#AddApprover', (e) => {
+        i++;
         console.log("ONCHAGE")
         //console.log("Chnage")
-        //var htm = $('#LoaTemplate').html();
-        //htm
-        //htm = htm.replace(/\{idx}/g, '27')
-        //htm = htm.replace(/\{lblApprover}/g, 'Approver #5')
-        //htm = htm.replace(/\"display: none;"/g, '')
-        //console.log(htm)
-        //$('#LoaDetails').append(htm);
+        var htm = $('#LoaTemplate').html();
+        htm = htm.replace(/\{idx}/g, i)
+        htm = htm.replace(/\{lblApprover}/g, 'Approver #' + i)
+        htm = htm.replace(/\"display: none;"/g, '')
+        console.log(htm)
+        $('#LoaDetails').append(htm);
+
     })
 
     $(document).on('submit', '.loa-form', (e) => {
@@ -27,14 +27,15 @@ $(document).ready(() => {
         });
 
         var form = $(".loa-form");
+        var lineOfApprovalId = $("[name='id']", form).val() == '' ? 0 : $("[name='id']", form).val();
         var model = {
-            id: $("[name='id']", form).val(),
+            id: lineOfApprovalId,
             name: $("[name='name']", form).val(),
             businessunit: $("[name='businessunit']", form).val(),
             approvers: $("[name='approverneeded']", form).val()
         };
 
-        var postUrl = $("[name='id']", form).val() == '' ? '/editlineofapprovals' : '/updatelineofapprovals';
+        var postUrl = $("[name='id']", form).val() == '' ? '/editlineofapprovals/' + lineOfApprovalId : '/updatelineofapprovals';
         console.log({ data: JSON.stringify(model), approverList: JSON.stringify(approverList) });
 
         $.ajax({

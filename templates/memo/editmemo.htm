@@ -1,8 +1,4 @@
-{% extends 'admin/adminbase.htm' %}
-
-{% block javascript %}
-    <script src="/static/site/js/lineofapproval.js"></script>
-{% endblock %}
+{% extends 'base.htm' %}
 
 {% block content %}
 <div class="row">
@@ -46,103 +42,40 @@
     <div class="col-lg-12 mb-4">
         <div class="card">
             <div class="card-header">
-                <h3 class="h6 text-uppercase mb-0">Add Line Of Approval</h3>
+                <h3 class="h6 text-uppercase mb-0">Add Memo</h3>
             </div>
             <div class="card-body">
-                <form class="form-horizontal loa-form" method="POST">
+                <form class="form-horizontal edit-memo-form" method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="id" value="{{editLineOfApproval.id}}">
+                    <input type="hidden" name="id" value="{{editMemo.id}}">
                     <div class="form-group row">
-                        <label class="col-md-3 form-control-label">Name</label>
+                            <label class="col-md-3 form-control-label">Business Unit
+                                {{editLineOfApproval.businessunit.id}}</label>
+                            <div class="col-md-9 select mb-3">
+                                <select id="MemoBU" name="businessunit" class="form-control" required {% if editMemo.id > 0  %} disabled {% endif %}>
+                                    <option value="">Select Business Unit</option>
+                                    {% for businessunit in businessunits %}
+                                    <option value="{{businessunit.id}}"
+                                        {% if businessunit.id == editMemo.businessunit.id %} selected {% endif %}>
+                                        {{businessunit.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Document No.</label>
                         <div class="col-md-9">
-                            <input type="text" name="name" value="{{editLineOfApproval.name}}" class="form-control"
-                                required>
+                            <input id="DocumentNumber" type="text" name="documentno" value="{{editMemo.documentno}}" class="form-control" required
+                                disabled>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 form-control-label">Business Unit
-                            {{editLineOfApproval.businessunit.id}}</label>
-                        <div class="col-md-9 select mb-3">
-                            <select name="businessunit" class="form-control" required>
-                                <option value="">Select Business Unit</option>
-                                {% for businessunit in businessunits %}
-                                <option value="{{businessunit.id}}"
-                                    {% if businessunit.id == editLineOfApproval.businessunit.id %} selected {% endif %}>
-                                    {{businessunit.name}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 form-control-label">Number Of Approver's</label>
-                        <div class="col-md-9">
-                            <input id="Approvers" type="number" name="approverneeded"
-                                value="{{editLineOfApproval.no_of_approver}}" min="0" max="{{users | length}}"
-                                class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                            <div class="col-md-9 ml-auto">
-                                <button id="AddApprover" type="button" class="btn btn-primary float-right"><i class="fa fa-plus" aria-hidden="true"></i> Add Approver</button>
-                            </div>
-                        </div>
-
-                    <div id="LoaDetails">
-                        {% for lineOfApprovalDetail in editLineOfApprovalDetail %}
-                        <div class="form-group row approver-line-item">
-                            <input type="hidden" name="lineOfApprovalId" value="{{lineOfApprovalDetail.line_of_approval_id}}">
-                            <input type="hidden" name="lineOfApprovalDetailId" value="{{lineOfApprovalDetail.id}}">
-                            <label class="col-md-3 form-control-label">Approver #{{ forloop.counter }}</label>
+                            <label class="col-md-3 form-control-label">Topic</label>
                             <div class="col-md-9">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <select name="approver" class="form-control" required>
-                                            <option value="">Select Approver</option>
-                                            {% for user in users %}
-                                            <option value="{{user.id}}"
-                                                {% if user.user_id == lineOfApprovalDetail.approver.id %} selected
-                                                {% endif %}>{{user.user.username}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="custom-control custom-checkbox">
-                                            <input id="customCheck{{ forloop.counter }}" name="mustapprove" type="checkbox"
-                                                class="custom-control-input"
-                                                {% if lineOfApprovalDetail.must_approve == True %} checked
-                                                {% endif %}>
-                                            <label for="customCheck{{ forloop.counter }}" class="custom-control-label">Must approve</label>
-                                        </div>
-                                    </div>
-                                </div>
+                                <input type="text" name="topic" value="{{editMemo.topic}}" class="form-control"
+                                    required>
                             </div>
                         </div>
-                        {% endfor %}
-
-                        <!-- <div class="form-group row approver-line-item">
-                            <label class="col-md-3 form-control-label">Approver #2</label>
-                            <div class="col-md-9">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <select name="approver" class="form-control" required>
-                                            <option value="">Select Approver</option>
-                                            {% for user in users %}
-                                            <option value="{{user.id}}">{{user.username}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="custom-control custom-checkbox">
-                                            <input id="customCheck2" name="mustapprove" type="checkbox"
-                                                class="custom-control-input">
-                                            <label for="customCheck2" class="custom-control-label">Must approve</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
-                    </div>
                     <div class="line"></div>
 
 
@@ -411,7 +344,7 @@
                     <div class="line"></div> -->
                     <div class="form-group row">
                         <div class="col-md-9 ml-auto">
-                            <button type="button" onclick="location.href = '/lineofapprovals'" class="btn btn-secondary">Cancel</button>
+                            <button type="button" onclick="location.href = '/memo'" class="btn btn-secondary">Cancel</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>
@@ -421,29 +354,4 @@
     </div>
 </div>
 
-<div id="LoaTemplate">
-    <div class="form-group row approver-line-item" style="display: none;">
-        <label class="col-md-3 form-control-label">{lblApprover}</label>
-        <div class="col-md-9">
-            <div class="row">
-                <div class="col-md-5">
-                    <select name="approver" class="form-control" required>
-                        <option value="">Select Approver</option>
-                        {% for user in users %}
-                        <option value="{{user.user_id}}">{{user.user.username}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <div class="custom-control custom-checkbox">
-                        <input id="customCheck{idx}" name="mustapprove" type="checkbox" class="custom-control-input">
-                        <label for="customCheck{idx}" class="custom-control-label">Must approve</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
-

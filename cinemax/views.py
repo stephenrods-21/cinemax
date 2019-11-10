@@ -4,8 +4,9 @@ from django.contrib import auth
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
-from cinemaxpr.models import businessunit, LineOfApproval, LineOfApprovalDetail, ExtendedUser
+from cinemaxpr.models import businessunit, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, Memo
 import json
+from cinemax.enums import Status
 from django.http import HttpResponse
 
 
@@ -51,12 +52,15 @@ def logoutUser(request):
 
 @user_passes_test(check_access)
 def adminDashboard(request):
-    return render(request, 'admin/admindashboard.htm', {'view':'dashboard', 'title': 'Dashboard'})
+    pending_count = Memo.objects.filter(approvalstatus_id=Status.PENDING.value).count()
+    approved_count = Memo.objects.filter(approvalstatus_id=Status.APPROVED.value).count()
+    rejected_count = Memo.objects.filter(approvalstatus_id=Status.REJECTED.value).count()
+    return render(request, 'admin/admindashboard.htm', {'view':'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count' : approved_count, 'rejected_count' : rejected_count})
 
 @user_passes_test(check_access)
 def manageUsers(request):
-    users = User.objects.all()
-    return render(request, 'admin/manageusers.htm', {'view':'manageusers', 'title': 'Manage Users', 'users': users, 'businessunits' : businessunit.objects.all()})
+    users = ExtendedUser.objects.all().select_related()
+    return render(request, 'admin/manageusers.htm', {'view':'manageusers', 'title': 'Manage Users', 'users': users, 'businessunits' : businessunit.objects.all(), 'roles' : Role.objects.all()})
 
 @user_passes_test(check_access)
 def businessunits(request):
@@ -77,7 +81,7 @@ def editlineOfApproval(request, id):
     if id > 0:
         editLineOfApproval = LineOfApproval.objects.get(id=id)
         editLineOfApprovalDetail = LineOfApprovalDetail.objects.filter(line_of_approval_id=editLineOfApproval.id)
-        return render(request, 'admin/editlineofapproval.htm', {'view':'lineofapprovals', 'title': 'Line Of Approval', 'editLineOfApproval' : editLineOfApproval, 'editLineOfApprovalDetail' : editLineOfApprovalDetail ,'businessunits' : businessunit.objects.all(), 'users': User.objects.all()})
+        return render(request, 'admin/editlineofapproval.htm', {'view':'lineofapprovals', 'title': 'Line Of Approval', 'editLineOfApproval' : editLineOfApproval, 'editLineOfApprovalDetail' : editLineOfApprovalDetail ,'businessunits' : businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
 
     if request.method == "POST":
         loaData = json.loads(request.POST['data'])
@@ -95,7 +99,7 @@ def editlineOfApproval(request, id):
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
 
-    return render(request, 'admin/editlineofapproval.htm', {'view':'lineofapprovals', 'title': 'Line Of Approval', 'businessunits' : businessunit.objects.all(), 'users': User.objects.all()})
+    return render(request, 'admin/editlineofapproval.htm', {'view':'lineofapprovals', 'title': 'Line Of Approval', 'businessunits' : businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
 
 @user_passes_test(check_access)
 def updateLineOfApproval(request):

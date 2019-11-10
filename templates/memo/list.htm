@@ -1,17 +1,17 @@
-{% extends 'admin/adminbase.htm' %}
+{% extends 'base.htm' %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-12 mb-4">
-        <button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-primary float-right"><i
-                class="fa fa-plus" aria-hidden="true"></i> Add User</button>
+        <button type="button" onclick="location.href = '/editmemo/0'" class="btn btn-primary float-right"><i
+                class="fa fa-plus" aria-hidden="true"></i> Add Memo</button>
         <!-- Modal-->
         <div id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
             class="modal fade text-left">
             <div role="document" class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 id="exampleModalLabel" class="modal-title">Add User</h5>
+                        <h5 id="exampleModalLabel" class="modal-title">Add Memo</h5>
                         <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
                                 aria-hidden="true">×</span></button>
                     </div>
@@ -29,9 +29,12 @@
                             <div class="form-group">
                                 <select name="role" class="form-control" required>
                                     <option value="">Select Role</option>
-                                    {% for role in roles %}
-                                    <option value="{{role.id}}">{{role.name}}</option>
-                                    {% endfor %}
+                                    <option value="1">Requester</option>
+                                    <option value="2">Chief 1</option>
+                                    <option value="3">Chief 2</option>
+                                    <option value="4">Chief 3</option>
+                                    <option value="5">Manager</option>
+                                    <option value="6">CEO</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -60,29 +63,36 @@
     <div class="col-lg-12 mb-4">
         <div class="card">
             <div class="card-header">
-                <h6 class="text-uppercase mb-0">All Users</h6>
+                <h6 class="text-uppercase mb-0">All Memo's</h6>
             </div>
             <div class="card-body">
-                <table class="table table-striped table-hover card-text">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Username</th>
-                            <th>Role</th>
+                            <th>Document No.</th>
+                            <th>Topic</th>
                             <th>Business Unit</th>
-                            <th>Is Admin</th>
-                            <th>Is Active</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
+                        {% for memo in memos %}
                         <tr>
-                            <th scope="row">{{user.id}}</th>
-                            <td>{{user.user.username}}</td>
-                            <td>{{user.role.name}}</td>
-                            <td>{{user.businessunit}}</td>
-                            <td>{% if user.is_superuser == 1 %} Yes {% else %} No {% endif %}</td>
-                            <td>{% if user.is_active == 1 %} Yes {% else %} No {% endif %}</td>
+                            <td scope="">{{memo.documentno}}</td>
+                            <td><a href="/editmemo/{{memo.id}}">{{memo.topic}}</a></td>
+                            <td>{{memo.businessunit.name}}</td>
+                            <td>
+                                <div
+                                    class="bg-white shadow roundy px-2 py-2 d-flex align-items-center justify-content-between mb-0">
+                                    <div class="flex-grow-1 d-flex align-items-center">
+                                        <div class="dot mr-3 bg-violet"></div>
+                                        <div class="text">
+                                            <h6 class="mb-0">{{memo.approvalstatus.name}}</h6>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

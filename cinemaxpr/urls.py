@@ -5,5 +5,9 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('dashboard', views.dashboard, name='dashboard'),
     path('memo', views.memo, name='memo'),
-    path('budget', views.budget, name='budget')
+    path('editmemo', views.editMemo, name='editmemo'),
+    path('editmemo/<int:id>', views.editMemo, name='editMemoById'),
+    path('updatememo', views.updateMemo, name='updateMemo'),
+    path('budget', views.budget, name='budget'),
+    path('getDocumentNumber/<int:buid>', views.getDocumentNumber, name='getdocumentnumber')
 ]
