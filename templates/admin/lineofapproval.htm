@@ -48,7 +48,7 @@
                 <table class="table table-striped table-hover card-text">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <!-- <th>#</th> -->
                             <th>Name</th>
                             <th>Business Unit</th>
                             <th>Is Active</th>
@@ -57,7 +57,7 @@
                     <tbody>
                         {% for lineofapproval in lineofapprovals %}
                         <tr>
-                            <th scope="row">{{lineofapproval.id}}</th>
+                            <!-- <th scope="row">{{lineofapproval.id}}</th> -->
                             <td><a href="/editlineofapprovals/{{lineofapproval.id}}">{{lineofapproval.name}}</a></td>
                             <td>{{lineofapproval.businessunit.name}}</td>
                             <td>{% if lineofapproval.is_active == 1 %} Yes {% else %} No {% endif %}</td>

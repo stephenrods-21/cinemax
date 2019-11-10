@@ -48,7 +48,7 @@
                 <table class="table table-striped table-hover card-text">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <!-- <th>#</th> -->
                             <th>Name</th>
                             <th>Prefix</th>
                             <th>Is Active</th>
@@ -57,7 +57,7 @@
                     <tbody>
                         {% for businessunit in businessunits %}
                         <tr>
-                            <th scope="row">{{businessunit.id}}</th>
+                            <!-- <th scope="row">{{businessunit.id}}</th> -->
                             <td>{{businessunit.name}}</td>
                             <td>{{businessunit.prefix}}</td>
                             <td>{% if user.is_active == 1 %} Yes {% else %} No {% endif %}</td>
