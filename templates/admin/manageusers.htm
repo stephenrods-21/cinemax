@@ -26,9 +26,27 @@
                                 <label>Password</label>
                                 <input type="password" placeholder="Password" name="pass" class="form-control" required>
                             </div>
-                            <!-- <div class="form-group">
-                                <input type="submit" value="Signin" class="btn btn-primary">
-                            </div> -->
+                            <div class="form-group">
+                                <select name="role" class="form-control" required>
+                                    <option value="">Select Role</option>
+                                    <option value="1">Requester</option>
+                                    <option value="2">Chief 1</option>
+                                    <option value="3">Chief 2</option>
+                                    <option value="4">Chief 3</option>
+                                    <option value="5">Manager</option>
+                                    <option value="6">CEO</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <select name="businessunit" class="form-control" required>
+                                    <option value="">Select Business Unit</option>
+                                    {% for businessunit in businessunits %}
+                                    <option value="{{businessunit.id}}" {% if businessunit.id == 1 %} selected
+                                        {% endif %}>
+                                        {{businessunit.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" data-dismiss="modal" class="btn btn-secondary">Close</button>

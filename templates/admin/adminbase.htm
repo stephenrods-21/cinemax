@@ -101,9 +101,9 @@
         <li class="sidebar-list-item"><a href="{% url 'businessunits' %}"
             class="sidebar-link text-muted {% if view == 'businessunits' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Business Units</span></a></li>
-              <li class="sidebar-list-item"><a href="{% url 'lineofapproval' %}"
-                class="sidebar-link text-muted {% if view == 'lineofapproval' %} active {% endif %}"><i
-                  class="o-sales-up-1 mr-3 text-gray"></i><span>Line Of Approval</span></a></li>
+        <li class="sidebar-list-item"><a href="{% url 'lineofapprovals' %}"
+            class="sidebar-link text-muted {% if view == 'lineofapprovals' %} active {% endif %}"><i
+              class="o-sales-up-1 mr-3 text-gray"></i><span>Line Of Approval</span></a></li>
         <!-- <li class="sidebar-list-item"><a href="tables.html" class="sidebar-link text-muted"><i class="o-table-content-1 mr-3 text-gray"></i><span>Tables</span></a></li>
               <li class="sidebar-list-item"><a href="forms.html" class="sidebar-link text-muted"><i class="o-survey-1 mr-3 text-gray"></i><span>Forms</span></a></li> -->
         <!-- <li class="sidebar-list-item"><a href="#" data-toggle="collapse" data-target="#pages" aria-expanded="false" aria-controls="pages" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Pages</span></a>
@@ -159,6 +159,8 @@
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
   <script src="{% static 'admin/js/charts-home.js' %}"></script>
   <script src="{% static 'admin/js/front.js' %}"></script>
+  <script src="{% static 'site/js/lineofapproval.js' %}"></script>
+  
 </body>
 
 </html>

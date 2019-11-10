@@ -1,0 +1,443 @@
+{% extends 'admin/adminbase.htm' %}
+
+{% block javascript %}
+    <script src="/static/site/js/lineofapproval.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <!-- <button type="button" onclick="location.href = '/editlineofapproval'" class="btn btn-primary float-right"><i
+                class="fa fa-plus" aria-hidden="true"></i> Add Line Of Approval</button> -->
+        <!-- Modal-->
+        <!-- <div id="addLOAModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+            class="modal fade text-left">
+            <div role="document" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="exampleModalLabel" class="modal-title">Add Line Of Approval</h5>
+                        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
+                                aria-hidden="true">×</span></button>
+                    </div>
+                    <form action="addbusinessunit" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" placeholder="Business unit name" name="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Prefix</label>
+                                <input type="text" placeholder="Prefix" name="prefix" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h6 text-uppercase mb-0">Add Line Of Approval</h3>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal loa-form" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{editLineOfApproval.id}}">
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Name</label>
+                        <div class="col-md-9">
+                            <input type="text" name="name" value="{{editLineOfApproval.name}}" class="form-control"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Business Unit
+                            {{editLineOfApproval.businessunit.id}}</label>
+                        <div class="col-md-9 select mb-3">
+                            <select name="businessunit" class="form-control" required>
+                                <option value="">Select Business Unit</option>
+                                {% for businessunit in businessunits %}
+                                <option value="{{businessunit.id}}"
+                                    {% if businessunit.id == editLineOfApproval.businessunit.id %} selected {% endif %}>
+                                    {{businessunit.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Number Of Approver's</label>
+                        <div class="col-md-9">
+                            <input id="Approvers" type="number" name="approverneeded"
+                                value="{{editLineOfApproval.no_of_approver}}" min="0" max="{{users | length}}"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div id="LoaDetails">
+                        {% for lineOfApprovalDetail in editLineOfApprovalDetail %}
+                        <div class="form-group row approver-line-item">
+                            <input type="hidden" name="lineOfApprovalId" value="{{lineOfApprovalDetail.line_of_approval_id}}">
+                            <input type="hidden" name="lineOfApprovalDetailId" value="{{lineOfApprovalDetail.id}}">
+                            <label class="col-md-3 form-control-label">Approver #{{ forloop.counter }}</label>
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <select name="approver" class="form-control" required>
+                                            <option value="">Select Approver</option>
+                                            {% for user in users %}
+                                            <option value="{{user.id}}"
+                                                {% if user.id == lineOfApprovalDetail.approver.id %} selected
+                                                {% endif %}>{{user.username}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input id="customCheck{{ forloop.counter }}" name="mustapprove" type="checkbox"
+                                                class="custom-control-input"
+                                                {% if lineOfApprovalDetail.must_approve == True %} checked
+                                                {% endif %}>
+                                            <label for="customCheck{{ forloop.counter }}" class="custom-control-label">Must approve</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- <div class="form-group row approver-line-item">
+                            <label class="col-md-3 form-control-label">Approver #2</label>
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <select name="approver" class="form-control" required>
+                                            <option value="">Select Approver</option>
+                                            {% for user in users %}
+                                            <option value="{{user.id}}">{{user.username}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input id="customCheck2" name="mustapprove" type="checkbox"
+                                                class="custom-control-input">
+                                            <label for="customCheck2" class="custom-control-label">Must approve</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div class="line"></div>
+
+
+                    <!-- <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Help text</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control"><small class="form-text text-muted ml-3">A block of
+                                help text that breaks onto a new line and may extend beyond one line.</small>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Password</label>
+                        <div class="col-md-9">
+                            <input type="password" name="password" class="form-control">
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Placeholder</label>
+                        <div class="col-md-9">
+                            <input type="text" placeholder="placeholder" class="form-control">
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Ranges</label>
+                        <div class="col-md-9">
+                            <div>
+                                <label for="formControlRange">Example Range</label>
+                                <input id="formControlRange" type="range" class="form-control-range">
+                            </div>
+                            <div>
+                                <label for="customRange1">Custom Range</label>
+                                <input id="customRange1" type="range" class="custom-range">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Disabled</label>
+                        <div class="col-md-9">
+                            <input type="text" disabled="" placeholder="Disabled input here..." class="form-control">
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Checkboxes and radios <br><small
+                                class="text-primary">Standard HTML elements</small></label>
+                        <div class="col-md-9">
+                            <div>
+                                <input id="option" type="checkbox" value="">
+                                <label for="option">Option one is this and that—be sure to include why it's
+                                    great</label>
+                            </div>
+                            <div>
+                                <input id="optionsRadios1" type="radio" checked="" value="option1" name="optionsRadios">
+                                <label for="optionsRadios1">Option one is this and that be sure to include why it's
+                                    great</label>
+                            </div>
+                            <div>
+                                <input id="optionsRadios2" type="radio" value="option2" name="optionsRadios">
+                                <label for="optionsRadios2">Option two can be something else and selecting it will
+                                    deselect option one</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Inline checkboxes</label>
+                        <div class="col-md-9">
+                            <label class="checkbox-inline">
+                                <input id="inlineCheckbox1" type="checkbox" value="option1"> a
+                            </label>
+                            <label class="checkbox-inline">
+                                <input id="inlineCheckbox2" type="checkbox" value="option2"> b
+                            </label>
+                            <label class="checkbox-inline">
+                                <input id="inlineCheckbox3" type="checkbox" value="option3"> c
+                            </label>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Checkboxes &amp; radios <br><small
+                                class="text-primary">Bootstrap4 custom controls</small></label>
+                        <div class="col-md-9">
+                            <div class="custom-control custom-checkbox">
+                                <input id="customCheck1" type="checkbox" class="custom-control-input">
+                                <label for="customCheck1" class="custom-control-label">Check this custom
+                                    checkbox</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input id="customRadioInline1" type="radio" name="customRadioInline1"
+                                    class="custom-control-input">
+                                <label for="customRadioInline1" class="custom-control-label">Toggle this custom
+                                    radio</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input id="customRadioInline2" type="radio" name="customRadioInline1"
+                                    class="custom-control-input">
+                                <label for="customRadioInline2" class="custom-control-label">Or toggle this other custom
+                                    radio</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Select</label>
+                        <div class="col-md-9 select mb-3">
+                            <select name="account" class="form-control">
+                                <option>option 1</option>
+                                <option>option 2</option>
+                                <option>option 3</option>
+                                <option>option 4</option>
+                            </select>
+                        </div>
+                        <div class="col-md-9 ml-auto select">
+                            <select multiple="" class="form-control rounded">
+                                <option>option 1</option>
+                                <option>option 2</option>
+                                <option>option 3</option>
+                                <option>option 4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row has-success">
+                        <label class="col-sm-3 form-control-label">Input with success</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control is-valid">
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row has-danger">
+                        <label class="col-sm-3 form-control-label">Input with error</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control is-invalid">
+                            <div class="invalid-feedback ml-3">Please provide your name.</div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Control sizing</label>
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <input type="text" placeholder=".input-lg" class="form-control form-control-lg">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" placeholder="Default input" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" placeholder=".input-sm" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Column sizing</label>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="text" placeholder=".col-md-3" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" placeholder=".col-md-4" class="form-control">
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" placeholder=".col-md-5" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Input groups</label>
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                                    <input type="text" aria-label="Dollar amount (with dot and two decimal places)"
+                                        class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" aria-label="Dollar amount (with dot and two decimal places)"
+                                        class="form-control">
+                                    <div class="input-group-append"><span class="input-group-text">$</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                                    <input type="text" aria-label="Amount (to the nearest dollar)" class="form-control">
+                                    <div class="input-group-append"><span class="input-group-text">.00</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" aria-label="Checkbox for following text input">
+                                        </div>
+                                    </div>
+                                    <input type="text" aria-label="Text input with checkbox" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="radio" aria-label="Radio button for following text input">
+                                        </div>
+                                    </div>
+                                    <input type="text" aria-label="Text input with radio button" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Button addons</label>
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <button id="button-addon1" type="button" class="btn btn-primary">Button</button>
+                                    </div>
+                                    <input type="text" placeholder="" aria-label="Example text with button addon"
+                                        aria-describedby="button-addon1" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <input type="text" placeholder="Recipient's username"
+                                        aria-label="Recipient's username" aria-describedby="button-addon2"
+                                        class="form-control">
+                                    <div class="input-group-append">
+                                        <button id="button-addon2" type="button" class="btn btn-primary">Button</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">With dropdowns</label>
+                        <div class="col-md-9">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <button type="button" data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false"
+                                        class="btn btn-outline-primary dropdown-toggle">Dropdown</button>
+                                    <div class="dropdown-menu"><a href="#" class="dropdown-item">Action</a><a href="#"
+                                            class="dropdown-item">Another action</a><a href="#"
+                                            class="dropdown-item">Something else here</a>
+                                        <div role="separator" class="dropdown-divider"></div><a href="#"
+                                            class="dropdown-item">Separated link</a>
+                                    </div>
+                                </div>
+                                <input type="text" aria-label="Text input with dropdown button" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line"></div> -->
+                    <div class="form-group row">
+                        <div class="col-md-9 ml-auto">
+                            <button type="reset" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="LoaTemplate">
+    <div class="form-group row approver-line-item" style="display: none;">
+        <label class="col-md-3 form-control-label">{lblApprover}</label>
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-5">
+                    <select name="approver" class="form-control" required>
+                        <option value="">Select Approver</option>
+                        {% for user in users %}
+                        <option value="{{user.id}}">{{user.username}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-control custom-checkbox">
+                        <input id="customCheck{idx}" name="mustapprove" type="checkbox" class="custom-control-input">
+                        <label for="customCheck{idx}" class="custom-control-label">Must approve</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

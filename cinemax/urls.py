@@ -26,6 +26,10 @@ urlpatterns = [
     path('manageusers', views.manageUsers, name='manageusers'),
     path('addbusinessunit', views.addBusinessUnit, name='addbusinessunit'),
     path('businessunits', views.businessunits, name='businessunits'),
-    path('lineofapproval', views.lineOfApproval, name='lineofapproval'),
+    path('lineofapprovals', views.lineOfApproval, name='lineofapprovals'),
+    path('editlineofapprovals', views.editlineOfApproval, name='editlineofapprovals'),
+    path('editlineofapprovals/<int:id>', views.editlineOfApproval, name='editlineofapprovalid'),
+    path('updatelineofapprovals', views.updateLineOfApproval, name='updateLineOfApproval'),
+    path('deletelineofapproval/<int:id>', views.deleteLineOfApproval, name='deleteLineOfApproval'),
     path('admin/', admin.site.urls),
 ]
