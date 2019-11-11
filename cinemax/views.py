@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
+from django.db.models import Max
 from cinemaxpr.models import businessunit, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, Memo
 import json
 from cinemax.enums import Status
@@ -39,7 +40,7 @@ def addUser(request):
         return redirect('manageusers')
         
     user = User.objects.create_user(username=request.POST['uname'],password=request.POST['pass'])
-    extendedUser = ExtendedUser(role=request.POST['role'],businessunit_id=request.POST['businessunit'],user_id=user.id)
+    extendedUser = ExtendedUser(role_id=request.POST['role'],businessunit_id=request.POST['businessunit'],user_id=user.id)
     extendedUser.save()
 
     return redirect('manageusers')
@@ -81,7 +82,9 @@ def editlineOfApproval(request, id):
     if id > 0:
         editLineOfApproval = LineOfApproval.objects.get(id=id)
         editLineOfApprovalDetail = LineOfApprovalDetail.objects.filter(line_of_approval_id=editLineOfApproval.id)
-        return render(request, 'admin/editlineofapproval.htm', {'view':'lineofapprovals', 'title': 'Line Of Approval', 'editLineOfApproval' : editLineOfApproval, 'editLineOfApprovalDetail' : editLineOfApprovalDetail ,'businessunits' : businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
+        maxLevel=LineOfApprovalDetail.objects.filter(line_of_approval_id=editLineOfApproval.id).aggregate(Max('level'))
+
+        return render(request, 'admin/editlineofapproval.htm', {'view':'lineofapprovals', 'title': 'Line Of Approval', 'max_level': maxLevel['level__max'], 'editLineOfApproval' : editLineOfApproval, 'editLineOfApprovalDetail' : editLineOfApprovalDetail ,'businessunits' : businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
 
     if request.method == "POST":
         loaData = json.loads(request.POST['data'])
@@ -94,7 +97,9 @@ def editlineOfApproval(request, id):
         for approver in loaApproverList:
             lineOfApprovalDetail = LineOfApprovalDetail(line_of_approval=lineOfApproval,
             approver=User.objects.get(id=approver['approver_id']),
-            must_approve=approver['must_approve'])
+            must_approve=approver['must_approve'],
+            level=approver['level'])
+            
             lineOfApprovalDetail.save()
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
@@ -113,10 +118,14 @@ def updateLineOfApproval(request):
         lineOfApproval.no_of_approver = loaData['approvers']
         lineOfApproval.save()
 
-        for approverDetail in loaApproverList:
-            lineOfApprovalDetail = LineOfApprovalDetail.objects.get(id=approverDetail['line_of_approval_detail_id'])
-            lineOfApprovalDetail.approver = User.objects.get(id=approverDetail['approver_id'])
-            lineOfApprovalDetail.must_approve = approverDetail['must_approve']
+        LineOfApprovalDetail.objects.filter(line_of_approval_id=lineOfApproval.id).delete()
+
+        for approver in loaApproverList:
+            lineOfApprovalDetail = LineOfApprovalDetail(line_of_approval=lineOfApproval,
+            approver=User.objects.get(id=approver['approver_id']),
+            must_approve=approver['must_approve'],
+            level=approver['level'])
+            
             lineOfApprovalDetail.save()
 
     return redirect('lineofapprovals')
