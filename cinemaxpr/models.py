@@ -79,14 +79,22 @@ class ApprovalStatus(models.Model):
     def __str__(self):
         return self.name
 
+class BudgetDetail(models.Model):
+    description = models.CharField(max_length=500, null=False)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_deleted = models.BooleanField(default=False)
+    created_on = models.DateTimeField(null=True)
+    modified_on = models.DateTimeField(null=True)
+    deleted_on = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class Memo(models.Model):
+
+class MemoDetail(models.Model):
     documentno = models.CharField(max_length=50, null=False)
     topic = models.CharField(max_length=500, null=False)
     businessunit = models.ForeignKey(businessunit, on_delete=models.CASCADE)
-    approvalstatus = models.ForeignKey(
-        ApprovalStatus, on_delete=models.CASCADE)
-    is_active = models.BooleanField(default=True)
+    approvalstatus = models.ForeignKey(ApprovalStatus, on_delete=models.CASCADE)
+    budget = models.ForeignKey(BudgetDetail, blank=True, null=True, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     created_on = models.DateTimeField(null=True)
     deadline_on = models.DateTimeField(null=True)
@@ -96,3 +104,18 @@ class Memo(models.Model):
 
     def __str__(self):
         return self.topic
+
+class TransactionDetail(models.Model):
+    level = models.IntegerField(null=False, default=1)
+    extendeduser = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE)
+    must_approve = models.BooleanField(default=False)
+    transactionstatus = models.IntegerField(null=False, default=1)
+    lineOfApproval = models.IntegerField(null=False, default=0)
+    businessunit = models.IntegerField(null=False, default=1)
+    memo = models.IntegerField(null=False, default=1)
+    is_deleted = models.BooleanField(default=False)
+    created_on = models.DateTimeField(null=True)
+    modified_on = models.DateTimeField(null=True)
+    deleted_on = models.DateTimeField(null=True)
+    #created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+

@@ -49,34 +49,53 @@
                     {% csrf_token %}
                     <input type="hidden" name="id" value="{{editMemo.id}}">
                     <div class="form-group row">
-                            <label class="col-md-3 form-control-label">Business Unit
-                                {{editLineOfApproval.businessunit.id}}</label>
-                            <div class="col-md-9 select mb-3">
-                                <select id="MemoBU" name="businessunit" class="form-control" required {% if editMemo.id > 0  %} disabled {% endif %}>
-                                    <option value="">Select Business Unit</option>
-                                    {% for businessunit in businessunits %}
-                                    <option value="{{businessunit.id}}"
-                                        {% if businessunit.id == editMemo.businessunit.id %} selected {% endif %}>
-                                        {{businessunit.name}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 form-control-label">Document No.</label>
-                        <div class="col-md-9">
-                            <input id="DocumentNumber" type="text" name="documentno" value="{{editMemo.documentno}}" class="form-control" required
-                                disabled>
+                        <label class="col-md-3 form-control-label">Business Unit
+                            {{editLineOfApproval.businessunit.id}}</label>
+                        <div class="col-md-9 select mb-3">
+                            <select id="MemoBU" name="businessunit" class="form-control" required
+                                {% if editMemo.id > 0  %} disabled {% endif %}>
+                                <option value="">Select Business Unit</option>
+                                {% for businessunit in businessunits %}
+                                <option value="{{businessunit.id}}" {% if businessunit.id == editMemo.businessunit.id %}
+                                    selected {% endif %}>
+                                    {{businessunit.name}}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                     <div class="form-group row">
-                            <label class="col-md-3 form-control-label">Topic</label>
-                            <div class="col-md-9">
-                                <input type="text" name="topic" value="{{editMemo.topic}}" class="form-control"
-                                    required>
-                            </div>
+                        <label class="col-md-3 form-control-label">Document No.</label>
+                        <div class="col-md-9">
+                            <input id="DocumentNumber" type="text" name="documentno" value="{{editMemo.documentno}}"
+                                class="form-control" required disabled>
                         </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Topic</label>
+                        <div class="col-md-9">
+                            <input type="text" name="topic" value="{{editMemo.topic}}" class="form-control" required>
+                        </div>
+                    </div>
                     <div class="line"></div>
+
+                    <div class="row" style="margin-bottom: 25px;">
+                        <h5 class="col-md-9 float-left">Budget Details</h4>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Description</label>
+                        <div class="col-md-9">
+                            <textarea type="text" rows="3" name="description" class="form-control"
+                                required>{{editMemo.budget.description}}</textarea>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-3 form-control-label">Estimated Budget</label>
+                        <div class="col-md-9 input-group">
+                            <input type="text" name="amount" value="{{editMemo.budget.amount}}" 
+                                class="form-control"  {% if editMemo.budget_id > 0  %} disabled {% endif %}>
+                            <div class="input-group-append"><span class="input-group-text">THB</span></div>
+                        </div>
+                    </div>
 
 
                     <!-- <div class="form-group row">
@@ -344,7 +363,8 @@
                     <div class="line"></div> -->
                     <div class="form-group row">
                         <div class="col-md-9 ml-auto">
-                            <button type="button" onclick="location.href = '/memo'" class="btn btn-secondary">Cancel</button>
+                            <button type="button" onclick="location.href = '/memo'"
+                                class="btn btn-secondary">Cancel</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>

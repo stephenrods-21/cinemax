@@ -5,7 +5,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Max
-from cinemaxpr.models import businessunit, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, Memo
+from cinemaxpr.models import businessunit, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, MemoDetail
 import json
 from cinemax.enums import Status
 from django.http import HttpResponse
@@ -53,9 +53,9 @@ def logoutUser(request):
 
 @user_passes_test(check_access)
 def adminDashboard(request):
-    pending_count = Memo.objects.filter(approvalstatus_id=Status.PENDING.value).count()
-    approved_count = Memo.objects.filter(approvalstatus_id=Status.APPROVED.value).count()
-    rejected_count = Memo.objects.filter(approvalstatus_id=Status.REJECTED.value).count()
+    pending_count = MemoDetail.objects.filter(approvalstatus_id=Status.PENDING.value).count()
+    approved_count = MemoDetail.objects.filter(approvalstatus_id=Status.APPROVED.value).count()
+    rejected_count = MemoDetail.objects.filter(approvalstatus_id=Status.REJECTED.value).count()
     return render(request, 'admin/admindashboard.htm', {'view':'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count' : approved_count, 'rejected_count' : rejected_count})
 
 @user_passes_test(check_access)

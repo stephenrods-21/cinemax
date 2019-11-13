@@ -9,5 +9,6 @@ urlpatterns = [
     path('editmemo/<int:id>', views.editMemo, name='editMemoById'),
     path('updatememo', views.updateMemo, name='updateMemo'),
     path('budget', views.budget, name='budget'),
-    path('getDocumentNumber/<int:buid>', views.getDocumentNumber, name='getdocumentnumber')
+    path('getDocumentNumber/<int:buid>', views.getDocumentNumber, name='getdocumentnumber'),
+    path('updateTransactionStatus/<int:tid>/<int:isApproved>', views.updateTransactionStatus, name='updateTransactionStatus')
 ]
