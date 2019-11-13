@@ -136,3 +136,8 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'cinemaxprth@gmail.com'
 EMAIL_HOST_PASSWORD = 'SR9767458029#'
+
+# STRING CONSTANTS
+REJECTED_EMAIL_TEMPLATE = "Dear {}, Unfortunately, your memo request for '{}' has been rejected. Thank you."
+APPROVED_EMAIL_TEMPLATE = "Dear {}, Your Memo '{}' has been approved by CEO. Thank you."
+

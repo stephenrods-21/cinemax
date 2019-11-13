@@ -52,6 +52,7 @@
                             <th>Name</th>
                             <th>Business Unit</th>
                             <th>Is Active</th>
+                            <th>&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,6 +62,7 @@
                             <td><a href="/editlineofapprovals/{{lineofapproval.id}}">{{lineofapproval.name}}</a></td>
                             <td>{{lineofapproval.businessunit.name}}</td>
                             <td>{% if lineofapproval.is_active == 1 %} Yes {% else %} No {% endif %}</td>
+                            <td><button class="btn btn-danger delete-loa" data-loa-id="{{lineofapproval.id}}">Delete</button></td>
                         </tr>
                         {% endfor %}
                     </tbody>

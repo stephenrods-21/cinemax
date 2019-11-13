@@ -6,6 +6,8 @@ from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, LineOfAppro
 import json
 from cinemax.enums import Status
 from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 @login_required(login_url='login')
@@ -22,7 +24,7 @@ def dashboard(request):
     rejected_count = MemoDetail.objects.filter(
         approvalstatus_id=Status.REJECTED.value, created_by_id=request.user.id).count()
     transactions = TransactionDetail.objects.filter(
-        extendeduser_id=request.user.id, transactionstatus=Status.PENDING.value).select_related()
+        extendeduserObj=request.user.id, transactionstatus=Status.PENDING.value).select_related()
     return render(request, 'dashboard.htm', {'view': 'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count': approved_count, 'rejected_count': rejected_count, 'transactions': transactions})
 
 
@@ -64,10 +66,9 @@ def editMemo(request, id):
             # from level 1 make entry in transactions table for LOA
             for loaDetail in lineOfApprovalDetail:
                 transaction = TransactionDetail(level=loaDetail.level, must_approve=loaDetail.must_approve,
-                                                businessunit_id=lineOfApproval.businessunit_id, created_by_id=request.user.id,
-                                                lineOfApproval=lineOfApproval.id,
-                                                extendeduser_id=loaDetail.approver_id, memo_id=memo.id, transactionstatus_id=Status.PENDING.value)
-
+                                                businessunitObj=lineOfApproval.businessunit_id,
+                                                lineOfApprovalObj=lineOfApproval.id,
+                                                extendeduserObj=loaDetail.approver_id, memoObj_id=memo.id, transactionstatus=Status.PENDING.value)
                 transaction.save()
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
@@ -103,18 +104,27 @@ def getDocumentNumber(request, buid):
 
 
 def updateTransactionStatus(request, tid, isApproved):
-
+   transaction = TransactionDetail.objects.get(id=tid)
    if isApproved == 1:
-       transaction = TransactionDetail.objects.get(id=tid)
        transaction.transactionstatus = Status.APPROVED.value
        transaction.save();
    else:
-       transaction = TransactionDetail.objects.get(id=tid)
        transaction.transactionstatus = Status.REJECTED.value
        transaction.save();
 
-   if isApproved == 0 and transaction.must_approve == True:
-       print("REJECTED")
+   if isApproved == 0 and transaction.must_approve:
+       print("SET STATUS AS REJECTED AND SEND EMAIL")
+       memo = MemoDetail.objects.get(id=transaction.memoObj_id)
+       memo.approvalstatus_id = Status.REJECTED.value
+       memo.save()
+       
+       extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
+       subject = 'Memo Rejected'
+       message = settings.REJECTED_EMAIL_TEMPLATE.format(extendeduser.user.username, memo.topic)
+       email_from = settings.EMAIL_HOST_USER
+       recipient_list = [extendeduser.email]
+       send_mail( subject, message, email_from, recipient_list )
+       return HttpResponse(json.dumps({'status': "Rejected"}), content_type="application/json")
    elif isApproved == 1:
         # check if there are any more pending approvals needs to be approved where must_approve is true
         if TransactionDetail.objects.filter(transactionstatus=Status.PENDING.value, must_approve=True).count()  > 0:
@@ -122,19 +132,32 @@ def updateTransactionStatus(request, tid, isApproved):
             return HttpResponse(json.dumps({'status': "WAITING FOR OTHERS TO APPROVE"}), content_type="application/json")
         
         # Once all approve in the current Level, check if more level of approval is needed
-        nextLevel = transaction.level + 1
-        lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(line_of_approval_id=transaction.lineOfApproval, level=nextLevel)
+        next_level = transaction.level + 1
+        line_of_approval_detail = LineOfApprovalDetail.objects.filter(line_of_approval_id=transaction.lineOfApprovalObj, level=next_level)
 
-        if(lineOfApprovalDetail.count() > 0):
-            print("REQUIRE FURTHER LOA LEVEL 2 {}",transaction.lineOfApproval)
-            for loaDetail in lineOfApprovalDetail:
-                transactionDetail = TransactionDetail(level=loaDetail.level, must_approve=loaDetail.must_approve,
-                                                extendeduser_id=loaDetail.approver_id,
-                                                lineOfApproval=loaDetail.line_of_approval_id,
-                                                businessunit=transaction.businessunit,
+        if(line_of_approval_detail.count() > 0):
+            print("REQUIRE FURTHER LOA LEVEL 2 {}",transaction.lineOfApprovalObj)
+            for loa_detail in line_of_approval_detail:
+                transaction_detail = TransactionDetail(level=loa_detail.level, must_approve=loa_detail.must_approve,
+                                                extendeduserObj=loa_detail.approver_id,
+                                                lineOfApprovalObj=loa_detail.line_of_approval_id,
+                                                businessunitObj=transaction.businessunitObj,
+                                                memoObj=transaction.memoObj,
                                                 transactionstatus=Status.PENDING.value)
-                transactionDetail.save()
+                transaction_detail.save()
         else:
             print("NO MORE LOA LEVEL, SO SET TRANSACTION STATUS TO APPROVED")
+            memo = MemoDetail.objects.get(id=transaction.memoObj_id)
+            memo.approvalstatus_id = Status.APPROVED.value
+            memo.save()
+
+            extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
+
+            subject = "Memo Approved By CEO"
+            message = settings.APPROVED_EMAIL_TEMPLATE.format(extendeduser.user.username, memo.topic)
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [extendeduser.email]
+            print(message, extendeduser.email)
+            send_mail( subject, message, email_from, recipient_list )
     
    return HttpResponse(json.dumps({'documentno': "123"}), content_type="application/json")

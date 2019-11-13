@@ -1,52 +1,58 @@
 {% extends 'base.htm' %}
 
 {% block content %}
-<div class="row">
-  <div class="col-lg-12">
-    <div class="row">
-      <div class="col-xl-4 col-lg-4 mb-4 mb-xl-0">
-        <div class="bg-white shadow roundy p-4 h-100 d-flex align-items-center justify-content-between">
-          <div class="flex-grow-1 d-flex align-items-center">
-            <div class="dot mr-3 bg-violet"></div>
-            <div class="text">
-              <h6 class="mb-0">Pending</h6><span class="text-gray">{{pending_count}}</span>
+
+<section class="py-5">
+  {% if request.session.role == "Requester" %}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="row">
+        <div class="col-xl-4 col-lg-4 mb-4 mb-xl-0">
+          <div class="bg-white shadow roundy p-4 h-100 d-flex align-items-center justify-content-between">
+            <div class="flex-grow-1 d-flex align-items-center">
+              <div class="dot mr-3 bg-violet"></div>
+              <div class="text">
+                <h6 class="mb-0">Pending</h6><span class="text-gray">{{pending_count}}</span>
+              </div>
             </div>
+            <div class="icon text-white bg-violet"><i class="fas fa-server"></i></div>
           </div>
-          <div class="icon text-white bg-violet"><i class="fas fa-server"></i></div>
         </div>
-      </div>
-      <div class="col-xl-4 col-lg-4 mb-4 mb-xl-0">
-        <div class="bg-white shadow roundy p-4 h-100 d-flex align-items-center justify-content-between">
-          <div class="flex-grow-1 d-flex align-items-center">
-            <div class="dot mr-3 bg-green"></div>
-            <div class="text">
-              <h6 class="mb-0">Approved</h6><span class="text-gray">{{approved_count}}</span>
+        <div class="col-xl-4 col-lg-4 mb-4 mb-xl-0">
+          <div class="bg-white shadow roundy p-4 h-100 d-flex align-items-center justify-content-between">
+            <div class="flex-grow-1 d-flex align-items-center">
+              <div class="dot mr-3 bg-green"></div>
+              <div class="text">
+                <h6 class="mb-0">Approved</h6><span class="text-gray">{{approved_count}}</span>
+              </div>
             </div>
+            <div class="icon text-white bg-green"><i class="far fa-clipboard"></i></div>
           </div>
-          <div class="icon text-white bg-green"><i class="far fa-clipboard"></i></div>
         </div>
-      </div>
-      <div class="col-xl-4 col-lg-4 mb-4 mb-xl-0">
-        <div class="bg-white shadow roundy p-4 h-100 d-flex align-items-center justify-content-between">
-          <div class="flex-grow-1 d-flex align-items-center">
-            <div class="dot mr-3 bg-red"></div>
-            <div class="text">
-              <h6 class="mb-0">Rejected</h6><span class="text-gray">{{rejected_count}}</span>
+        <div class="col-xl-4 col-lg-4 mb-4 mb-xl-0">
+          <div class="bg-white shadow roundy p-4 h-100 d-flex align-items-center justify-content-between">
+            <div class="flex-grow-1 d-flex align-items-center">
+              <div class="dot mr-3 bg-red"></div>
+              <div class="text">
+                <h6 class="mb-0">Rejected</h6><span class="text-gray">{{rejected_count}}</span>
+              </div>
             </div>
+            <div class="icon text-white bg-red"><i class="fas fa-receipt"></i></div>
           </div>
-          <div class="icon text-white bg-red"><i class="fas fa-receipt"></i></div>
         </div>
       </div>
     </div>
   </div>
-</div>
+  {% endif %}
+</section>
 
 <!-- LOA Transaction History-->
+{% if request.session.role != "Requester"  %}
 <div class="row">
   <div class="col-lg-12">
     <div class="card mb-4 mb-lg-0">
       <div class="card-header">
-        <h2 class="h6 mb-0 text-uppercase">Transaction history</h2>
+        <h2 class="h6 mb-0 text-uppercase">Pending Memo Approval</h2>
       </div>
       <div class="card-body">
         <p class="text-gray mb-3">You can approve or reject the approval requests from the list below.</p>
@@ -56,14 +62,18 @@
           <div class="left d-flex align-items-center">
             <!-- <div class="icon icon-lg shadow mr-3 text-gray"><i class="fab fa-dropbox"></i></div> -->
             <div class="text">
-              <h6 class="mb-0 d-flex align-items-center"> <span>{{transaction.memo.topic}}.</span><span
-                  class="dot dot-sm ml-2 bg-violet"></span></h6><small
-                class="text-gray">{{transaction.memo.budget.description}}</small>
+              <h6 class="mb-0 d-flex align-items-center"> <span>{{transaction.memoObj.topic}}.</span>
+                <!-- <span class="dot dot-sm ml-2 bg-violet"></span> -->
+              </h6><small
+                class="text-gray">{{transaction.memoObj.budget.description}} | {{transaction.memoObj.budget.amount}}
+                THB</small>
             </div>
           </div>
           <div class="right ml-5 ml-sm-0 pl-3 pl-sm-0 text-violet">
-              <button type="button" class="btn btn-default float-right approve-request" data-transaction-id="{{transaction.id}}">Approve</button>
-              <button type="button" class="btn btn-default float-right reject-request" data-transaction-id="{{transaction.id}}">Reject</button>
+            <button type="button" class="btn btn-success float-right approve-request"
+              data-transaction-id="{{transaction.id}}"><i class="fa fa-check-circle" aria-hidden="true"></i></button>
+            <button type="button" style="margin-right: 10px;" class="btn btn-danger float-right reject-request"
+              data-transaction-id="{{transaction.id}}"><i class="fa fa-times-circle" aria-hidden="true"></i></button>
           </div>
         </div>
         {% endfor %}
@@ -71,4 +81,5 @@
     </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}

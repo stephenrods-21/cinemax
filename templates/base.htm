@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="{% static 'admin/css/style.default.css' %}" id="theme-stylesheet">
   <!-- Custom stylesheet - for your changes-->
   <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+  <link rel="stylesheet" href="{% static 'site/css/site.css' %}">
   <!-- Favicon-->
   <link rel="shortcut icon" href="{% static 'admin/img/favicon.png?3' %}">
   <!-- Tweaks for older IEs-->
@@ -79,7 +80,7 @@
               src="{% static 'admin/img/admin-avatar.jpg' %}" alt="" style="max-width: 2.5rem;"
               class="img-fluid rounded-circle shadow"></a>
           <div aria-labelledby="userInfo" class="dropdown-menu"><a href="#" class="dropdown-item"><strong
-                class="d-block text-uppercase headings-font-family">{{user.username}}</strong><small>{% if user.is_superuser == 1 %} Admin {% else %} Manager {% endif %}</small></a>
+                class="d-block text-uppercase headings-font-family">{{user.username}}</strong><small>{% if user.is_superuser == 1 %} Admin {% else %} {{request.session.role}} {% endif %}</small></a>
             <!-- <div class="dropdown-divider"></div><a href="#" class="dropdown-item">Settings</a><a href="#" class="dropdown-item">Activity log       </a> -->
             <div class="dropdown-divider"></div><a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
           </div>
@@ -94,9 +95,11 @@
         <li class="sidebar-list-item"><a href="{% url 'dashboard' %}"
             class="sidebar-link text-muted {% if view == 'dashboard' %} active {% endif %}"><i
               class="o-home-1 mr-3 text-gray"></i><span>Dashboard</span></a></li>
+              {% if request.session.role == "Requester" %}
         <li class="sidebar-list-item"><a href="{% url 'memo' %}"
             class="sidebar-link text-muted {% if view == 'memo' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Memo</span></a></li>
+              {% endif %}
         <!-- <li class="sidebar-list-item"><a href="tables.html" class="sidebar-link text-muted"><i class="o-table-content-1 mr-3 text-gray"></i><span>Tables</span></a></li>
               <li class="sidebar-list-item"><a href="forms.html" class="sidebar-link text-muted"><i class="o-survey-1 mr-3 text-gray"></i><span>Forms</span></a></li> -->
         <!-- <li class="sidebar-list-item"><a href="#" data-toggle="collapse" data-target="#pages" aria-expanded="false" aria-controls="pages" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Pages</span></a>
@@ -121,7 +124,6 @@
     </div>
     <div class="page-holder w-100 d-flex flex-wrap">
       <div class="container-fluid px-xl-5">
-        <section class="py-5">
           {% block content %}
 
           {% endblock %}

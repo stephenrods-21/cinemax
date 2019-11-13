@@ -16,6 +16,7 @@ $(document).ready(() => {
     })
 
     $(document).on('submit', '.edit-memo-form', (e) => {
+        $(this).attr('disabled', true);
         e.preventDefault();
 
         var form = $(".edit-memo-form");
@@ -23,11 +24,12 @@ $(document).ready(() => {
             id: $("[name='id']", form).val() == '' ? 0 : $("[name='id']", form).val(),
             businessunit: $("[name='businessunit']", form).val(),
             documentno: $("[name='documentno']", form).val(),
-            topic: $("[name='topic']", form).val()
+            topic: $("[name='topic']", form).val(),
+            description: $("[name='description']", form).val(),
+            amount: $("[name='amount']", form).val()
         };
 
         var postUrl = $("[name='id']", form).val() == '' ? '/editmemo/' + model.id : '/updatememo';
-        console.log({ data: JSON.stringify(model) });
 
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },

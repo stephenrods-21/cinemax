@@ -1,0 +1,72 @@
+{% extends 'admin/adminbase.htm' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h6 text-uppercase mb-0">Add User</h3>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal edit-user-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{editUser.id}}">
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Username</label>
+                        <div class="col-md-9">
+                            <input type="text" name="username" value="{{editUser.user.username}}" class="form-control"
+                                required {% if editUser.id > 0 %} disabled {% endif %}>
+                        </div>
+                    </div>
+                    {% if editUser == null %}
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Password</label>
+                        <div class="col-md-9">
+                            <input type="password" name="password" value="" class="form-control" required>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Email</label>
+                        <div class="col-md-9">
+                            <input type="text" name="email" value="{{editUser.email}}" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Business Unit</label>
+                        <div class="col-md-9 select mb-3">
+                            <select name="businessunit" class="form-control" required>
+                                <option value="">Select Business Unit</option>
+                                {% for businessunit in businessunits %}
+                                <option value="{{businessunit.id}}" {% if businessunit.id == editUser.businessunit_id %}
+                                    selected {% endif %}>
+                                    {{businessunit.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Role</label>
+                        <div class="col-md-9 select mb-3">
+                            <select name="role" class="form-control" required>
+                                <option value="">Select Role</option>
+                                {% for role in roles %}
+                                <option value="{{role.id}}" {% if role.id == editUser.role.id %} selected {% endif %}>
+                                    {{role.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-9 ml-auto">
+                            <button type="button" onclick="location.href = '/manageusers'"
+                                class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

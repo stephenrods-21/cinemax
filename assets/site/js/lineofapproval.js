@@ -1,18 +1,16 @@
-$(document).ready(() => {
+$(document).ready(function () {
     var j = 0;
     var lastIndx = 0;
     var levelIndx = 0;
 
-    $(document).on('click', '#AddLevel', function () {
-        // if ($(this).attr('data-last-indx') != undefined) {
-        //     lastIndx = parseInt($(this).attr('data-last-indx'));
-        // }
-        // if ($(this).attr('data-level-indx') != undefined) {
-        //     levelIndx = parseInt($(this).attr('data-level-indx'));
-        // }
+    $('#AddLevel').click(function (e) {
         j += 1;
+        levelIndx = $(this).attr('data-level-indx');
         if (levelIndx == NaN)
             levelIndx = 0;
+        else {
+            levelIndx = parseInt($(this).attr('data-level-indx'));
+        }
 
         lastIndx += 1;
         levelIndx += 1;
@@ -29,6 +27,23 @@ $(document).ready(() => {
         htm = htm.replace(/\"display: none;"/g, '')
 
         $('#LoaDetails').append(htm);
+    });
+
+    $(document).on('click', '.delete-loa', function (e) {
+        e.preventDefault();
+        var loaId = $(this).attr('data-loa-id');
+        $.ajax({
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            type: "POST",
+            url: "/deletelineofapproval/" + loaId,
+            data: {},
+            context: this,
+            success: function (data) {
+                console.log(data);
+                window.location.href = '/lineofapprovals';
+            }
+        });
+
     });
 
     $(document).on('click', '.add-approver', function (e) {
@@ -49,6 +64,7 @@ $(document).ready(() => {
     });
 
     $(document).on('submit', '.loa-form', (e) => {
+        $(this).attr('disabled', true);
         e.preventDefault();
 
         var approverList = [];
@@ -78,7 +94,6 @@ $(document).ready(() => {
         };
 
         var postUrl = $("[name='id']", form).val() == '' ? '/editlineofapprovals/' + lineOfApprovalId : '/updatelineofapprovals';
-        console.log({ data: JSON.stringify(model), approverList: JSON.stringify(filteredApproverList) });
 
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },

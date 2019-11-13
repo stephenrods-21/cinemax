@@ -16,6 +16,7 @@ $(document).ready(() => {
     })
 
     $(document).on('submit', '.edit-memo-form', (e) => {
+        $(this).attr('disabled', true);
         e.preventDefault();
 
         var form = $(".edit-memo-form");
@@ -29,7 +30,6 @@ $(document).ready(() => {
         };
 
         var postUrl = $("[name='id']", form).val() == '' ? '/editmemo/' + model.id : '/updatememo';
-        console.log({ data: JSON.stringify(model) });
 
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },

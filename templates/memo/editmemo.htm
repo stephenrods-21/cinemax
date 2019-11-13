@@ -365,7 +365,7 @@
                         <div class="col-md-9 ml-auto">
                             <button type="button" onclick="location.href = '/memo'"
                                 class="btn btn-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
+                            <button type="submit" class="btn btn-primary">{% if editMemo.id > 0 %} Save changes {% else %} Submit for approval {% endif %}</button>
                         </div>
                     </div>
                 </form>
