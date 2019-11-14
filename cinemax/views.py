@@ -38,6 +38,7 @@ def login(request):
     else:
         return render(request, 'account/login.htm', {'view': 'login'})
 
+
 @user_passes_test(check_access)
 def editUser(request, id):
     if id > 0:
@@ -109,6 +110,18 @@ def addBusinessUnit(request):
 
 
 @user_passes_test(check_access)
+def roles(request):
+    return render(request, 'admin/roles.htm', {'view': 'roles', 'title': 'Role', 'roles': Role.objects.all()})
+
+
+@user_passes_test(check_access)
+def addRole(request):
+    role = Role(name=request.POST['name'], created_by_id=request.user.id)
+    role.save()
+    return redirect('roles')
+
+
+@user_passes_test(check_access)
 def lineOfApproval(request):
     return render(request, 'admin/lineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'lineofapprovals': LineOfApproval.objects.all()})
 
@@ -119,30 +132,33 @@ def editlineOfApproval(request, id):
         editLineOfApproval = LineOfApproval.objects.get(id=id)
         editLineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
             line_of_approval_id=editLineOfApproval.id)
-        maxLevel = LineOfApprovalDetail.objects.filter(line_of_approval_id=editLineOfApproval.id).aggregate(Max('level'))
+        maxLevel = LineOfApprovalDetail.objects.filter(
+            line_of_approval_id=editLineOfApproval.id).aggregate(Max('level'))
 
         return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': maxLevel['level__max'], 'editLineOfApproval': editLineOfApproval, 'editLineOfApprovalDetail': editLineOfApprovalDetail, 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
 
     if request.method == "POST":
         loaData = json.loads(request.POST['data'])
         loaApproverList = json.loads(request.POST['approverList'])
+        loaApprovalRuleList = json.loads(request.POST['approvalRuleList'])
 
         lineOfApproval = LineOfApproval(name=loaData['name'], businessunit=businessunit.objects.get(id=loaData['businessunit']),
-                                        no_of_approver=loaData['approvers'], created_by=request.user)
+                                        no_of_approver=0, created_by=request.user)
         lineOfApproval.save()
 
         for approver in loaApproverList:
             lineOfApprovalDetail = LineOfApprovalDetail(line_of_approval=lineOfApproval,
                                                         approver=User.objects.get(
                                                             id=approver['approver_id']),
-                                                        must_approve=approver['must_approve'],
+                                                        required_approval=loaApprovalRuleList[int(
+                                                            approver["level"])-1]['required_approval'],
                                                         level=approver['level'])
 
             lineOfApprovalDetail.save()
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
 
-    return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level' : 0, 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
+    return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': 0, 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
 
 
 @user_passes_test(check_access)
@@ -150,11 +166,11 @@ def updateLineOfApproval(request):
     if request.method == "POST":
         loaData = json.loads(request.POST['data'])
         loaApproverList = json.loads(request.POST['approverList'])
+        loaApprovalRuleList = json.loads(request.POST['approvalRuleList'])
 
         lineOfApproval = LineOfApproval.objects.get(id=loaData['id'])
         lineOfApproval.name = loaData['name']
         lineOfApproval.businessuint = loaData['businessunit']
-        lineOfApproval.no_of_approver = loaData['approvers']
         lineOfApproval.save()
 
         LineOfApprovalDetail.objects.filter(
@@ -164,7 +180,8 @@ def updateLineOfApproval(request):
             lineOfApprovalDetail = LineOfApprovalDetail(line_of_approval=lineOfApproval,
                                                         approver=User.objects.get(
                                                             id=approver['approver_id']),
-                                                        must_approve=approver['must_approve'],
+                                                        required_approval=loaApprovalRuleList[int(
+                                                            approver["level"])-1]['required_approval'],
                                                         level=approver['level'])
 
             lineOfApprovalDetail.save()

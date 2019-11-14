@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(() => {
     var j = 0;
     var lastIndx = 0;
     var levelIndx = 0;
@@ -18,6 +18,7 @@ $(document).ready(function () {
         $(this).attr('data-level-indx', levelIndx);
 
         var htm = $('#LoaTemplate').html();
+        htm = htm.replace(/\approval-rule/g, 'approval-rule-list')
         htm = htm.replace(/\{idx}/g, levelIndx)
         htm = htm.replace(/\{j}/g, j)
         htm = htm.replace(/\{level}/g, 'Level #' + levelIndx)
@@ -56,11 +57,16 @@ $(document).ready(function () {
         var htm = $('#zmr').html();
         htm = htm.replace(/\{j}/g, j)
         htm = htm.replace(/\{idx}/g, lastIndx)
+        htm = htm.replace(/\approver-line/g, 'approver-line-item')
         htm = htm.replace(/\{level}/g, parseInt($(this).attr('data-level-indx')))
         htm = htm.replace(/\{lblApprover}/g, 'Approver #' + lastIndx)
         htm = htm.replace(/\"display: none;"/g, '')
 
+        $('#ApprovalRule' + lineIndx).find('[name="requiredapproval"]').attr('max', lastIndx)
+        $('#ApprovalRule' + lineIndx).find('[name="totalapproval"]').val(lastIndx);
+
         $('#ApproverList' + lineIndx).append(htm);
+
     });
 
     $(document).on('submit', '.loa-form', (e) => {
@@ -71,7 +77,7 @@ $(document).ready(function () {
         $('.approver-line-item').each((idx, elm) => {
             approverList.push({
                 approver_id: $(elm).find('[name="approver"]').val(),
-                must_approve: $(elm).find(':checkbox:checked').length > 0 ? true : false,
+                //must_approve: $(elm).find(':checkbox:checked').length > 0 ? true : false,
                 level: $(elm).find('[name="level"]').val(),
                 line_of_approval_id: $(elm).find('[name="lineOfApprovalId"]').val(),
                 line_of_approval_detail_id: $(elm).find('[name="lineOfApprovalDetailId"]').val()
@@ -84,6 +90,16 @@ $(document).ready(function () {
                 filteredApproverList.push(approverList[i])
         }
 
+        var approvalRuleList = [];
+        var i = 1;
+        $('.approval-rule-list').each((idx, elm) => {
+            approvalRuleList.push({
+                level: i,
+                required_approval: $(elm).find('[name="requiredapproval"]').val()
+            })
+            i++;
+        });
+
         var form = $(".loa-form");
         var lineOfApprovalId = $("[name='id']", form).val() == '' ? 0 : $("[name='id']", form).val();
         var model = {
@@ -95,15 +111,21 @@ $(document).ready(function () {
 
         var postUrl = $("[name='id']", form).val() == '' ? '/editlineofapprovals/' + lineOfApprovalId : '/updatelineofapprovals';
 
+        console.log({ data: JSON.stringify(model), approverList: JSON.stringify(filteredApproverList), approvalRuleList: JSON.stringify(approvalRuleList) })
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },
             type: "POST",
+            beforeSend: function () {
+                $('.ajax-loader').css("visibility", "visible");
+            },
             url: postUrl,
-            data: { data: JSON.stringify(model), approverList: JSON.stringify(filteredApproverList) },
+            data: { data: JSON.stringify(model), approverList: JSON.stringify(filteredApproverList), approvalRuleList: JSON.stringify(approvalRuleList) },
             context: this,
             success: function (data) {
-                console.log(data);
                 window.location.href = '/lineofapprovals';
+            },
+            complete: function () {
+                $('.ajax-loader').css("visibility", "hidden");
             }
         });
         return false;

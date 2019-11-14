@@ -65,7 +65,7 @@ def editMemo(request, id):
 
             # from level 1 make entry in transactions table for LOA
             for loaDetail in lineOfApprovalDetail:
-                transaction = TransactionDetail(level=loaDetail.level, must_approve=loaDetail.must_approve,
+                transaction = TransactionDetail(level=loaDetail.level, required_approval=loaDetail.required_approval,
                                                 businessunitObj=lineOfApproval.businessunit_id,
                                                 lineOfApprovalObj=lineOfApproval.id,
                                                 extendeduserObj=loaDetail.approver_id, memoObj_id=memo.id, transactionstatus=Status.PENDING.value)
@@ -112,22 +112,32 @@ def updateTransactionStatus(request, tid, isApproved):
        transaction.transactionstatus = Status.REJECTED.value
        transaction.save();
 
-   if isApproved == 0 and transaction.must_approve:
-       print("SET STATUS AS REJECTED AND SEND EMAIL")
-       memo = MemoDetail.objects.get(id=transaction.memoObj_id)
-       memo.approvalstatus_id = Status.REJECTED.value
-       memo.save()
-       
-       extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
-       subject = 'Memo Rejected'
-       message = settings.REJECTED_EMAIL_TEMPLATE.format(extendeduser.user.username, memo.topic)
-       email_from = settings.EMAIL_HOST_USER
-       recipient_list = [extendeduser.email]
-       send_mail( subject, message, email_from, recipient_list )
-       return HttpResponse(json.dumps({'status': "Rejected"}), content_type="application/json")
+   if isApproved == 0:
+       memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
+       rejected_transactions = TransactionDetail.objects.filter(memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.REJECTED.value)
+       if rejected_transactions.count() <= transaction.required_approval:
+           memo = MemoDetail.objects.get(id=transaction.memoObj_id)
+           memo.approvalstatus_id = Status.REJECTED.value
+           memo.save()
+
+           extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
+           subject = 'Memo Rejected'
+           message = settings.REJECTED_EMAIL_TEMPLATE.format(extendeduser.user.username, memo.topic)
+           email_from = settings.EMAIL_HOST_USER
+           recipient_list = [extendeduser.email]
+           send_mail( subject, message, email_from, recipient_list )
+           print("REJECTED")
+           return HttpResponse(json.dumps({'status': "Rejected"}), content_type="application/json")
+
+       return HttpResponse(json.dumps({'status': "Waitng for others"}), content_type="application/json")
+
    elif isApproved == 1:
         # check if there are any more pending approvals needs to be approved where must_approve is true
-        if TransactionDetail.objects.filter(transactionstatus=Status.PENDING.value, must_approve=True).count()  > 0:
+        # Get Transaction in approved status
+        memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
+        approved_transactions = TransactionDetail.objects.filter(memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.APPROVED.value)
+
+        if approved_transactions.count() < transaction.required_approval:
             print("WAITING FOR OTHERS TO APPROVE")
             return HttpResponse(json.dumps({'status': "WAITING FOR OTHERS TO APPROVE"}), content_type="application/json")
         
@@ -138,7 +148,7 @@ def updateTransactionStatus(request, tid, isApproved):
         if(line_of_approval_detail.count() > 0):
             print("REQUIRE FURTHER LOA LEVEL 2 {}",transaction.lineOfApprovalObj)
             for loa_detail in line_of_approval_detail:
-                transaction_detail = TransactionDetail(level=loa_detail.level, must_approve=loa_detail.must_approve,
+                transaction_detail = TransactionDetail(level=loa_detail.level, required_approval=loa_detail.required_approval,
                                                 extendeduserObj=loa_detail.approver_id,
                                                 lineOfApprovalObj=loa_detail.line_of_approval_id,
                                                 businessunitObj=transaction.businessunitObj,

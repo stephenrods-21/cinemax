@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="{% static 'admin/css/style.default.css' %}" id="theme-stylesheet">
   <!-- Custom stylesheet - for your changes-->
   <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+  <link rel="stylesheet" href="{% static 'site/css/site.css' %}">
   <!-- Favicon-->
   <link rel="shortcut icon" href="{% static 'admin/img/favicon.png?3' %}">
   <!-- Tweaks for older IEs-->
@@ -31,6 +32,9 @@
 </head>
 
 <body>
+  <div class="ajax-loader">
+    <img src="{% static 'admin/img/speanload.gif' %}" class="img-responsive" width="50" height="50" />
+  </div>
   <!-- navbar-->
   <header class="header">
     <nav class="navbar navbar-expand-lg px-4 py-2 bg-white shadow"><a href="#"
@@ -95,6 +99,9 @@
         <li class="sidebar-list-item"><a href="{% url 'admindashboard' %}"
             class="sidebar-link text-muted {% if view == 'dashboard' %} active {% endif %}"><i
               class="o-home-1 mr-3 text-gray"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-list-item"><a href="{% url 'roles' %}"
+            class="sidebar-link text-muted {% if view == 'roles' %} active {% endif %}"><i class="fa fa-graduation-cap"
+              aria-hidden="true"></i>&nbsp;&nbsp;<span>Manage Roles</span></a></li>
         <li class="sidebar-list-item"><a href="{% url 'manageusers' %}"
             class="sidebar-link text-muted {% if view == 'manageusers' %} active {% endif %}"><i class="fa fa-users"
               aria-hidden="true"></i>&nbsp;&nbsp;<span>Manage Users</span></a></li>
@@ -104,27 +111,6 @@
         <li class="sidebar-list-item"><a href="{% url 'lineofapprovals' %}"
             class="sidebar-link text-muted {% if view == 'lineofapprovals' %} active {% endif %}"><i
               class="fa fa-sitemap" aria-hidden="true"></i>&nbsp;&nbsp;<span>Line Of Approval</span></a></li>
-        <!-- <li class="sidebar-list-item"><a href="tables.html" class="sidebar-link text-muted"><i class="o-table-content-1 mr-3 text-gray"></i><span>Tables</span></a></li>
-              <li class="sidebar-list-item"><a href="forms.html" class="sidebar-link text-muted"><i class="o-survey-1 mr-3 text-gray"></i><span>Forms</span></a></li> -->
-        <!-- <li class="sidebar-list-item"><a href="#" data-toggle="collapse" data-target="#pages" aria-expanded="false" aria-controls="pages" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Pages</span></a>
-            <div id="pages" class="collapse">
-              <ul class="sidebar-menu list-unstyled border-left border-primary border-thick">
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page one</a></li>
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page two</a></li>
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page three</a></li>
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page four</a></li>
-              </ul>
-            </div>
-          </li>
-              <li class="sidebar-list-item"><a href="login.html" class="sidebar-link text-muted"><i class="o-exit-1 mr-3 text-gray"></i><span>Login</span></a></li> -->
-      </ul>
-      <!-- <div class="text-gray-400 text-uppercase px-3 px-lg-4 py-4 font-weight-bold small headings-font-family">EXTRAS</div>
-        <ul class="sidebar-menu list-unstyled">
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-database-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-imac-screen-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-paperwork-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-        </ul> -->
     </div>
     <div class="page-holder w-100 d-flex flex-wrap">
       <div class="container-fluid px-xl-5">
@@ -157,7 +143,7 @@
   <script src="{% static 'admin/vendor/jquery.cookie/jquery.cookie.js' %}"> </script>
   <script src="{% static 'admin/vendor/chart.js/Chart.min.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-  <script src="{% static 'admin/js/charts-home.js' %}"></script>
+  <!-- <script src="{% static 'admin/js/charts-home.js' %}"></script> -->
   <script src="{% static 'admin/js/front.js' %}"></script>
   <script src="{% static 'site/js/lineofapproval.js' %}"></script>
   <script src="{% static 'site/js/manageusers.js' %}"></script>

@@ -15,7 +15,7 @@ $(document).ready(() => {
         }
     })
 
-    $(document).on('submit', '.edit-memo-form', (e) => {
+    $(document).on('submit', '.edit-memo-form', function (e) {
         $(this).attr('disabled', true);
         e.preventDefault();
 
@@ -34,11 +34,17 @@ $(document).ready(() => {
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },
             type: "POST",
+            beforeSend: function () {
+                $('.ajax-loader').css("visibility", "visible");
+            },
             url: postUrl,
             data: { data: JSON.stringify(model) },
             context: this,
             success: function (data) {
                 window.location.href = '/memo';
+            },
+            complete: function () {
+                $('.ajax-loader').css("visibility", "hidden");
             }
         });
         return false;

@@ -1,6 +1,6 @@
 $(document).ready(() => {
 
-    $(document).on('submit', '.edit-user-form', (e) => {
+    $(document).on('submit', '.edit-user-form', function (e) {
         $(this).attr('disabled', true);
         e.preventDefault();
 
@@ -21,11 +21,16 @@ $(document).ready(() => {
             headers: { "X-CSRFToken": getCookie("csrftoken") },
             type: "POST",
             url: postUrl,
+            beforeSend: function () {
+                $('.ajax-loader').css("visibility", "visible");
+            },
             data: { data: JSON.stringify(model) },
             context: this,
             success: function (data) {
-                console.log(data);
                 window.location.href = '/manageusers';
+            },
+            complete: function () {
+                $('.ajax-loader').css("visibility", "hidden");
             }
         });
         return false;

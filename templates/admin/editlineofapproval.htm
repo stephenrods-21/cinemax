@@ -1,47 +1,6 @@
 {% extends 'admin/adminbase.htm' %}
 
-{% block javascript %}
-<script src="/static/site/js/lineofapproval.js"></script>
-{% endblock %}
-
 {% block content %}
-<div class="row">
-    <div class="col-lg-12 mb-4">
-        <!-- <button type="button" onclick="location.href = '/editlineofapproval'" class="btn btn-primary float-right"><i
-                class="fa fa-plus" aria-hidden="true"></i> Add Line Of Approval</button> -->
-        <!-- Modal-->
-        <!-- <div id="addLOAModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-            class="modal fade text-left">
-            <div role="document" class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="exampleModalLabel" class="modal-title">Add Line Of Approval</h5>
-                        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
-                                aria-hidden="true">×</span></button>
-                    </div>
-                    <form action="addbusinessunit" method="POST">
-                        {% csrf_token %}
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" placeholder="Business unit name" name="name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Prefix</label>
-                                <input type="text" placeholder="Prefix" name="prefix" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" data-dismiss="modal" class="btn btn-secondary">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
-    </div>
-</div>
-
 <div class="row">
     <div class="col-lg-12 mb-4">
         <div class="card">
@@ -72,14 +31,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <!-- <div class="form-group row">
                         <label class="col-md-3 form-control-label">Number Of Approver's</label>
                         <div class="col-md-9">
                             <input id="Approvers" type="number" name="approverneeded"
                                 value="{{editLineOfApproval.no_of_approver}}" min="0" max="{{users | length}}"
                                 class="form-control">
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- <div class="form-group row">
                             <div class="col-md-9 ml-auto">
@@ -100,7 +59,7 @@
                     <div id="LoaDetails">
                         {% for level in approver_levels %}
                         <div class="line"></div>
-                        <div class="form-group row" style="">
+                        <div class="form-group row">
                             <div class="col-md-9 ">
                                 <h4 class="float-left">Level #{{ level.grouper }}</h4>
                             </div>
@@ -129,16 +88,16 @@
                                                 {% endfor %}
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <!-- <div class="col-md-4">
                                             <div class="custom-control custom-checkbox">
-                                                <input id="customCheck{{level.grouper}}{{forloop.counter}}" name="mustapprove"
-                                                    type="checkbox" class="custom-control-input"
+                                                <input id="customCheck{{level.grouper}}{{forloop.counter}}"
+                                                    name="mustapprove" type="checkbox" class="custom-control-input"
                                                     {% if approver.must_approve == True %} checked {% endif %}>
                                                 <label for="customCheck{{level.grouper}}{{forloop.counter}}"
                                                     class="custom-control-label">Must
                                                     approve</label>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                                 <!-- <div class="col-md-2">
@@ -147,43 +106,24 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <div class="line"></div>
-                        {% endfor %}
-                    </div>
-
-                    <!-- <div id="LoaDetails">
-                        {% for lineOfApprovalDetail in editLineOfApprovalDetail %}
-                        <div class="form-group row approver-line-item">
-                            <input type="hidden" name="lineOfApprovalId"
-                                value="{{lineOfApprovalDetail.line_of_approval_id}}">
-                            <input type="hidden" name="lineOfApprovalDetailId" value="{{lineOfApprovalDetail.id}}">
-                            <label class="col-md-3 form-control-label">Approver #{{ forloop.counter }}</label>
-                            <div class="col-md-9">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <select name="approver" class="form-control" required>
-                                            <option value="">Select Approver</option>
-                                            {% for user in users %}
-                                            <option value="{{user.id}}"
-                                                {% if user.user_id == lineOfApprovalDetail.approver.id %} selected
-                                                {% endif %}>{{user.user.username}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="custom-control custom-checkbox">
-                                            <input id="customCheck{{ forloop.counter }}" name="mustapprove"
-                                                type="checkbox" class="custom-control-input"
-                                                {% if lineOfApprovalDetail.must_approve == True %} checked {% endif %}>
-                                            <label for="customCheck{{ forloop.counter }}"
-                                                class="custom-control-label">Must approve</label>
+                        <div id="ApprovalRule{{ level.grouper }}" class="form-group row approval-rule-list" style="">
+                                <label class="col-md-3 form-control-label">Rule</label>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="number" name="requiredapproval" min="1" max="{{level.list | length}}" value="{{level.list.0.required_approval}}" class="form-control">
                                         </div>
+                                        <p style="margin-top: 10px;">of</p>
+                                        <div class="col-md-2">
+                                            <input type="number" name="totalapproval" min="1" max="{{level.list | length}}" value="{{level.list | length}}" class="form-control" disabled>
+                                        </div>
+                                        <p style="margin-top: 10px;">must approve</p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        <div class="line"></div>
                         {% endfor %}
-                    </div> -->
+                    </div>
 
                     <div class="line"></div>
 
@@ -226,14 +166,30 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="custom-control custom-checkbox">
                             <input id="customCheck{j}{lastindx}" name="mustapprove" type="checkbox"
                                 class="custom-control-input">
                             <label for="customCheck{j}{lastindx}" class="custom-control-label">Must approve</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="ApprovalRule{levelindx}" class="form-group row approval-rule" style="display: none;">
+        <label class="col-md-3 form-control-label">Rule</label>
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-2">
+                    <input type="number" name="requiredapproval" min="1" max="1" value="1" class="form-control">
+                </div>
+                <p style="margin-top: 10px;">of</p>
+                <div class="col-md-2">
+                    <input type="number" name="totalapproval" min="1" max="1" value="1" class="form-control" disabled>
+                </div>
+                <p style="margin-top: 10px;">must approve</p>
             </div>
         </div>
     </div>
@@ -241,7 +197,7 @@
 </div>
 
 <div id="zmr">
-    <div id="ApproverLineItem{idx}" class="form-group row approver-line-item" style="display: none;">
+    <div id="ApproverLineItem{idx}" class="form-group row approver-line" style="display: none;">
         <label class="col-md-3 form-control-label">{lblApprover}</label>
         <div class="col-md-9">
             <div class="row">
@@ -254,12 +210,13 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="custom-control custom-checkbox">
-                        <input id="customCheck{lastindx}{j}" name="mustapprove" type="checkbox" class="custom-control-input">
+                        <input id="customCheck{lastindx}{j}" name="mustapprove" type="checkbox"
+                            class="custom-control-input">
                         <label for="customCheck{lastindx}{j}" class="custom-control-label">Must approve</label>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

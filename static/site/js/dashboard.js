@@ -8,10 +8,16 @@ $(document).ready(() => {
         $.ajax({
             //headers: { "X-CSRFToken": getCookie("csrftoken") },
             type: "GET",
+            beforeSend: function () {
+                $('.ajax-loader').css("visibility", "visible");
+            },
             url: '/updateTransactionStatus/' + transactionId + '/1',
             context: this,
             success: function (data) {
-               window.location.reload();
+                window.location.reload();
+            },
+            complete: function () {
+                $('.ajax-loader').css("visibility", "hidden");
             }
         });
     })
@@ -24,10 +30,16 @@ $(document).ready(() => {
         $.ajax({
             //headers: { "X-CSRFToken": getCookie("csrftoken") },
             type: "GET",
+            beforeSend: function () {
+                $('.ajax-loader').css("visibility", "visible");
+            },
             url: '/updateTransactionStatus/' + transactionId + '/0',
             context: this,
             success: function (data) {
                 window.location.reload();
+            },
+            complete: function () {
+                $('.ajax-loader').css("visibility", "hidden");
             }
         });
     })
