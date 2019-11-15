@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
-from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
+from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, PurchaseRequisitionDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
 import json
 from cinemax.enums import Status
 from django.http import HttpResponse
@@ -96,6 +96,36 @@ def updateMemo(request):
 def budget(request):
     return render(request, 'budget.htm', {'view': 'budget'})
 
+@login_required(login_url='login')
+def purchaseRequisition(request):
+    return render(request, 'purchaserequisition/list.htm', {'view': 'purchaserequisition', 'title':'Purchase Requisition', 'purchaserequisitions': PurchaseRequisitionDetail.objects.all()})
+
+
+@login_required(login_url='login')
+def purchaseRequisitionMemo(request):
+    approved_memos = MemoDetail.objects.filter(
+        approvalstatus_id=Status.APPROVED.value).select_related()
+    return render(request, 'purchaserequisition/memolist.htm', {'view': 'approvedmemo', 'title': 'Approved Memo\'s', 'memos': approved_memos})
+
+
+@login_required(login_url='login')
+def editPurchaseRequisition(request, id, budgetid):
+    edit_purchase_requisition = PurchaseRequisitionDetail()
+    edit_purchase_requisition.id = 0
+    edit_purchase_requisition.budgetDetail = BudgetDetail.objects.get(id=budgetid)
+
+    print(edit_purchase_requisition)
+    if id > 0:
+        edit_purchase_requisition = PurchaseRequisitionDetail.objects.get(id=id)
+        return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit Memo', 'editMemo': editMemo, 'businessunits': businessunit.objects.all()})
+
+    if request.method == "POST":
+        purchaseRequisitionData = json.loads(request.POST['data'])
+
+        purchaseRequisition = PurchaseRequisitionDetail(title=purchaseRequisitionData['title'], budgetDetail_id=budgetid, created_by_id=request.user.id, status= ApprovalStatus.objects.get(id=Status.PENDING.value))
+        purchaseRequisition.save()
+    return render(request, 'purchaserequisition/editpurchaserequisition.htm', {'view': 'purchaserequisition', 'title': 'Edit Purchase Requisition', 'editPurchaseRequisition': edit_purchase_requisition})
+
 
 def getDocumentNumber(request, buid):
     bu = businessunit.objects.get(id=buid)
@@ -104,56 +134,63 @@ def getDocumentNumber(request, buid):
 
 
 def updateTransactionStatus(request, tid, isApproved):
-   transaction = TransactionDetail.objects.get(id=tid)
-   if isApproved == 1:
-       transaction.transactionstatus = Status.APPROVED.value
-       transaction.save();
-   else:
-       transaction.transactionstatus = Status.REJECTED.value
-       transaction.save();
+    transaction = TransactionDetail.objects.get(id=tid)
+    if isApproved == 1:
+        transaction.transactionstatus = Status.APPROVED.value
+        transaction.save()
+    else:
+        transaction.transactionstatus = Status.REJECTED.value
+        transaction.save()
 
-   if isApproved == 0:
-       memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
-       rejected_transactions = TransactionDetail.objects.filter(memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.REJECTED.value)
-       if rejected_transactions.count() <= transaction.required_approval:
-           memo = MemoDetail.objects.get(id=transaction.memoObj_id)
-           memo.approvalstatus_id = Status.REJECTED.value
-           memo.save()
+    if isApproved == 0:
+        memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
+        rejected_transactions = TransactionDetail.objects.filter(
+            memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.REJECTED.value)
+        if rejected_transactions.count() <= transaction.required_approval:
+            memo = MemoDetail.objects.get(id=transaction.memoObj_id)
+            memo.approvalstatus_id = Status.REJECTED.value
+            memo.save()
 
-           extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
-           subject = 'Memo Rejected'
-           message = settings.REJECTED_EMAIL_TEMPLATE.format(extendeduser.user.username, memo.topic)
-           email_from = settings.EMAIL_HOST_USER
-           recipient_list = [extendeduser.email]
-           send_mail( subject, message, email_from, recipient_list )
-           print("REJECTED")
-           return HttpResponse(json.dumps({'status': "Rejected"}), content_type="application/json")
+            extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
+            subject = 'Memo Rejected'
+            message = settings.REJECTED_EMAIL_TEMPLATE.format(
+                extendeduser.user.username, memo.topic)
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [extendeduser.email]
+            send_mail(subject, message, email_from, recipient_list)
+            print("REJECTED")
+            return HttpResponse(json.dumps({'status': "Rejected"}), content_type="application/json")
 
-       return HttpResponse(json.dumps({'status': "Waitng for others"}), content_type="application/json")
+        return HttpResponse(json.dumps({'status': "Waitng for others"}), content_type="application/json")
 
-   elif isApproved == 1:
+    elif isApproved == 1:
         # check if there are any more pending approvals needs to be approved where must_approve is true
         # Get Transaction in approved status
         memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
-        approved_transactions = TransactionDetail.objects.filter(memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.APPROVED.value)
+        approved_transactions = TransactionDetail.objects.filter(
+            memoObj_id=memo_detail.id,
+            level=transaction.level,
+            transactionstatus=Status.APPROVED.value)
 
         if approved_transactions.count() < transaction.required_approval:
             print("WAITING FOR OTHERS TO APPROVE")
             return HttpResponse(json.dumps({'status': "WAITING FOR OTHERS TO APPROVE"}), content_type="application/json")
-        
+
         # Once all approve in the current Level, check if more level of approval is needed
         next_level = transaction.level + 1
-        line_of_approval_detail = LineOfApprovalDetail.objects.filter(line_of_approval_id=transaction.lineOfApprovalObj, level=next_level)
+        line_of_approval_detail = LineOfApprovalDetail.objects.filter(
+            line_of_approval_id=transaction.lineOfApprovalObj, level=next_level)
 
         if(line_of_approval_detail.count() > 0):
-            print("REQUIRE FURTHER LOA LEVEL 2 {}",transaction.lineOfApprovalObj)
+            print("REQUIRE FURTHER LOA LEVEL 2 {}",
+                  transaction.lineOfApprovalObj)
             for loa_detail in line_of_approval_detail:
                 transaction_detail = TransactionDetail(level=loa_detail.level, required_approval=loa_detail.required_approval,
-                                                extendeduserObj=loa_detail.approver_id,
-                                                lineOfApprovalObj=loa_detail.line_of_approval_id,
-                                                businessunitObj=transaction.businessunitObj,
-                                                memoObj=transaction.memoObj,
-                                                transactionstatus=Status.PENDING.value)
+                                                       extendeduserObj=loa_detail.approver_id,
+                                                       lineOfApprovalObj=loa_detail.line_of_approval_id,
+                                                       businessunitObj=transaction.businessunitObj,
+                                                       memoObj=transaction.memoObj,
+                                                       transactionstatus=Status.PENDING.value)
                 transaction_detail.save()
         else:
             print("NO MORE LOA LEVEL, SO SET TRANSACTION STATUS TO APPROVED")
@@ -164,10 +201,11 @@ def updateTransactionStatus(request, tid, isApproved):
             extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
 
             subject = "Memo Approved By CEO"
-            message = settings.APPROVED_EMAIL_TEMPLATE.format(extendeduser.user.username, memo.topic)
+            message = settings.APPROVED_EMAIL_TEMPLATE.format(
+                extendeduser.user.username, memo.topic)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email]
             print(message, extendeduser.email)
-            send_mail( subject, message, email_from, recipient_list )
-    
-   return HttpResponse(json.dumps({'documentno': "123"}), content_type="application/json")
+            send_mail(subject, message, email_from, recipient_list)
+
+    return HttpResponse(json.dumps({'documentno': "123"}), content_type="application/json")

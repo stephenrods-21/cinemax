@@ -107,6 +107,17 @@ class MemoDetail(models.Model):
     def __str__(self):
         return self.topic
 
+class PurchaseRequisitionDetail(models.Model):
+    title = models.CharField(max_length=150, null=False)
+    budgetDetail = models.ForeignKey(BudgetDetail, on_delete=models.CASCADE)
+    status = models.ForeignKey(ApprovalStatus, on_delete=models.CASCADE)
+    is_deleted = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    deadline_on = models.DateTimeField(null=True)
+    modified_on = models.DateTimeField(null=True)
+    deleted_on = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
 class TransactionDetail(models.Model):
     level = models.IntegerField(null=False, default=1)
     #extendeduserObj = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE)

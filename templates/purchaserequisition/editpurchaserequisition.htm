@@ -1,0 +1,59 @@
+{% extends 'base.htm' %}
+
+{% block content %}
+
+<section class="py-3">
+
+</section>
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h6 text-uppercase mb-0">Add Purchase Requisition</h3>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal edit-purchaserequisition-form" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{editPurchaseRequisition.id}}">
+                    <input type="hidden" name="budgetid" value="{{editPurchaseRequisition.budgetDetail.id}}">
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Topic</label>
+                        <div class="col-md-9">
+                            <input type="text" name="title" value="{{editPurchaseRequisition.title}}" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+
+                    <div class="row" style="margin-bottom: 25px;">
+                        <h5 class="col-md-9 float-left">Budget Details</h4>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Description</label>
+                        <div class="col-md-9">
+                            <textarea type="text" rows="3" name="description" class="form-control"
+                                required>{{editPurchaseRequisition.budgetDetail.description}}</textarea>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-3 form-control-label">Estimated Budget</label>
+                        <div class="col-md-9 input-group">
+                            <input type="text" name="amount" value="{{editPurchaseRequisition.budgetDetail.amount}}" 
+                                class="form-control"  {% if editPurchaseRequisition.budget_id > 0  %} disabled {% endif %}>
+                            <div class="input-group-append"><span class="input-group-text">THB</span></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-md-9 ml-auto">
+                            <button type="button" onclick="location.href = '/purchaserequisition/memo'"
+                                class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">{% if editPurchaseRequisition.id > 0 %} Save changes {% else %} Submit for approval {% endif %}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
