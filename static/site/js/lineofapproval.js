@@ -3,10 +3,32 @@ $(document).ready(() => {
     var lastIndx = 0;
     var levelIndx = 0;
 
+    $(document).on('click', '.remove-level', function (e) {
+        if (confirm("Are you sure you want to delete the level?")) {
+            var levelCounter = 0;
+            var levelIndx = $(this).attr('data-level-indx');
+            $('#LevelBlock' + levelIndx).remove();
+            levelCounter += 1;
+
+            var deletedLevel = $(this).attr('data-level-indx');
+            var newIndex = parseInt(deletedLevel);
+            var prevLevel = newIndex;
+            $('.approver-line-item').each((idx, elm) => {
+                var currentLevel = $(elm).find('[name="level"]').val();
+                if (currentLevel >= deletedLevel) {
+                    $(elm).find('[name="level"]').val(currentLevel - 1);
+                }
+                prevLevel = currentLevel;
+            });
+            $('.loa-form').submit();
+        }
+    });
+
     $('#AddLevel').click(function (e) {
         j += 1;
         levelIndx = $(this).attr('data-level-indx');
-        if (levelIndx == NaN)
+        console.log(levelIndx)
+        if (levelIndx == NaN || levelIndx == "None")
             levelIndx = 0;
         else {
             levelIndx = parseInt($(this).attr('data-level-indx'));
@@ -48,21 +70,22 @@ $(document).ready(() => {
     });
 
     $(document).on('click', '.add-approver', function (e) {
+        debugger
         var lineIndx = $(this).attr('data-indx');
         var lastIndx = parseInt($(this).attr('data-last-indx'));
         lastIndx += 1;
         j += 1;
         $(this).attr('data-last-indx', lastIndx);
 
-        var htm = $('#zmr').html();
-        htm = htm.replace(/\{j}/g, j)
-        htm = htm.replace(/\{idx}/g, lastIndx)
-        htm = htm.replace(/\approver-line/g, 'approver-line-item')
-        htm = htm.replace(/\{level}/g, parseInt($(this).attr('data-level-indx')))
-        htm = htm.replace(/\{lblApprover}/g, 'Approver #' + lastIndx)
-        htm = htm.replace(/\"display: none;"/g, '')
+        var htm = $('#LevelSchema').html();
+        htm = htm.replace(/\{j}/g, j);
+        htm = htm.replace(/\{idx}/g, lastIndx);
+        htm = htm.replace(/\approver-line/g, 'approver-line-item');
+        htm = htm.replace(/\{level}/g, parseInt($(this).attr('data-level-indx')));
+        htm = htm.replace(/\{lblApprover}/g, 'Approver #' + lastIndx);
+        htm = htm.replace(/\"display: none;"/g, '');
 
-        $('#ApprovalRule' + lineIndx).find('[name="requiredapproval"]').attr('max', lastIndx)
+        $('#ApprovalRule' + lineIndx).find('[name="requiredapproval"]').attr('max', lastIndx);
         $('#ApprovalRule' + lineIndx).find('[name="totalapproval"]').val(lastIndx);
 
         $('#ApproverList' + lineIndx).append(htm);
@@ -74,11 +97,14 @@ $(document).ready(() => {
         e.preventDefault();
 
         var approverList = [];
+        var j = 0;
         $('.approver-line-item').each((idx, elm) => {
+            j += 1;
             approverList.push({
                 approver_id: $(elm).find('[name="approver"]').val(),
                 //must_approve: $(elm).find(':checkbox:checked').length > 0 ? true : false,
                 level: $(elm).find('[name="level"]').val(),
+                // level: j,
                 line_of_approval_id: $(elm).find('[name="lineOfApprovalId"]').val(),
                 line_of_approval_detail_id: $(elm).find('[name="lineOfApprovalDetailId"]').val()
             })

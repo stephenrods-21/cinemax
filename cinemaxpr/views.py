@@ -17,6 +17,11 @@ def index(request):
 
 @login_required(login_url='login')
 def dashboard(request):
+    current_user = ExtendedUser.objects.get(user_id=request.user.id)
+
+    memos = MemoDetail.objects.filter(
+        businessunit_id=current_user.businessunit_id)
+
     pending_count = MemoDetail.objects.filter(
         approvalstatus_id=Status.PENDING.value, created_by_id=request.user.id).count()
     approved_count = MemoDetail.objects.filter(
@@ -25,7 +30,7 @@ def dashboard(request):
         approvalstatus_id=Status.REJECTED.value, created_by_id=request.user.id).count()
     transactions = TransactionDetail.objects.filter(
         extendeduserObj=request.user.id, transactionstatus=Status.PENDING.value).select_related()
-    return render(request, 'dashboard.htm', {'view': 'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count': approved_count, 'rejected_count': rejected_count, 'transactions': transactions})
+    return render(request, 'dashboard.htm', {'view': 'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count': approved_count, 'rejected_count': rejected_count, 'transactions': transactions, 'memos': memos})
 
 
 @login_required(login_url='login')
@@ -96,9 +101,10 @@ def updateMemo(request):
 def budget(request):
     return render(request, 'budget.htm', {'view': 'budget'})
 
+
 @login_required(login_url='login')
 def purchaseRequisition(request):
-    return render(request, 'purchaserequisition/list.htm', {'view': 'purchaserequisition', 'title':'Purchase Requisition', 'purchaserequisitions': PurchaseRequisitionDetail.objects.all()})
+    return render(request, 'purchaserequisition/list.htm', {'view': 'purchaserequisition', 'title': 'Purchase Requisition', 'purchaserequisitions': PurchaseRequisitionDetail.objects.all()})
 
 
 @login_required(login_url='login')
@@ -112,17 +118,20 @@ def purchaseRequisitionMemo(request):
 def editPurchaseRequisition(request, id, budgetid):
     edit_purchase_requisition = PurchaseRequisitionDetail()
     edit_purchase_requisition.id = 0
-    edit_purchase_requisition.budgetDetail = BudgetDetail.objects.get(id=budgetid)
+    edit_purchase_requisition.budgetDetail = BudgetDetail.objects.get(
+        id=budgetid)
 
     print(edit_purchase_requisition)
     if id > 0:
-        edit_purchase_requisition = PurchaseRequisitionDetail.objects.get(id=id)
+        edit_purchase_requisition = PurchaseRequisitionDetail.objects.get(
+            id=id)
         return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit Memo', 'editMemo': editMemo, 'businessunits': businessunit.objects.all()})
 
     if request.method == "POST":
         purchaseRequisitionData = json.loads(request.POST['data'])
 
-        purchaseRequisition = PurchaseRequisitionDetail(title=purchaseRequisitionData['title'], budgetDetail_id=budgetid, created_by_id=request.user.id, status= ApprovalStatus.objects.get(id=Status.PENDING.value))
+        purchaseRequisition = PurchaseRequisitionDetail(
+            title=purchaseRequisitionData['title'], budgetDetail_id=budgetid, created_by_id=request.user.id, status=ApprovalStatus.objects.get(id=Status.PENDING.value))
         purchaseRequisition.save()
     return render(request, 'purchaserequisition/editpurchaserequisition.htm', {'view': 'purchaserequisition', 'title': 'Edit Purchase Requisition', 'editPurchaseRequisition': edit_purchase_requisition})
 
@@ -144,9 +153,15 @@ def updateTransactionStatus(request, tid, isApproved):
 
     if isApproved == 0:
         memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
-        rejected_transactions = TransactionDetail.objects.filter(
-            memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.REJECTED.value)
-        if rejected_transactions.count() <= transaction.required_approval:
+        # rejected_transactions = TransactionDetail.objects.filter(
+        #     memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.REJECTED.value)
+
+        pending_transactions = TransactionDetail.objects.filter(
+            memoObj_id=memo_detail.id, level=transaction.level, transactionstatus=Status.PENDING.value)
+
+        if pending_transactions.count() >= transaction.required_approval:
+            return HttpResponse(json.dumps({'status': "waiting for others"}), content_type="application/json")
+        else:
             memo = MemoDetail.objects.get(id=transaction.memoObj_id)
             memo.approvalstatus_id = Status.REJECTED.value
             memo.save()

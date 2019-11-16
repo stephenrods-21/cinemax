@@ -58,37 +58,42 @@
                     {% regroup editLineOfApprovalDetail by level as approver_levels %}
                     <div id="LoaDetails">
                         {% for level in approver_levels %}
-                        <div class="line"></div>
-                        <div class="form-group row">
-                            <div class="col-md-9 ">
-                                <h4 class="float-left">Level #{{ level.grouper }}</h4>
+                        <div id="LevelBlock{{ level.grouper }}">
+                            <div class="line"></div>
+                            <div class="form-group row">
+                                <div class="col-md-12" style="margin-bottom: 5px;">
+                                    <h4 class="float-left">Level #{{ level.grouper }}</h4>
+                                    <button type="button" data-level-indx="{{ level.grouper }}"
+                                        class="btn btn-default remove-level float-right"><i class="fa fa-trash"
+                                            style="color: #CC0000;" aria-hidden="true"></i></button>
+                                </div>
+                                <div class="col-md-9 ml-auto">
+                                    <button data-indx="{{ level.grouper }}" data-last-indx="{{level.list | length}}"
+                                        data-level-indx="{{level.grouper}}" type="button"
+                                        class="btn btn-primary add-approver float-right"><i class="fa fa-plus"
+                                            aria-hidden="true"></i> Add
+                                        Approver</button>
+                                </div>
                             </div>
-                            <div class="col-md-9 ml-auto">
-                                <button data-indx="{{ level.grouper }}" data-last-indx="{{level.list | length}}"
-                                    data-level-indx="{{level.grouper}}" type="button"
-                                    class="btn btn-primary add-approver float-right"><i class="fa fa-plus"
-                                        aria-hidden="true"></i> Add
-                                    Approver</button>
-                            </div>
-                        </div>
-                        <div id="ApproverList{{forloop.counter}}" class="loa-approvals">
-                            {% for approver in level.list %}
-                            <div class="form-group row approver-line-item" style="">
-                                <label class="col-md-3 form-control-label">Approver #{{forloop.counter}}</label>
-                                <div class="col-md-7">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <input type="hidden" name="level" value="{{ level.grouper }}" />
-                                            <select name="approver" class="form-control" required>
-                                                <option value="">Select Approver</option>
-                                                {% for user in users %}
-                                                <option value="{{user.user_id}}"
-                                                    {% if user.user_id == approver.approver_id %} selected {% endif %}>
-                                                    {{user.user.username}} - {{user.role.name}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <!-- <div class="col-md-4">
+                            <div id="ApproverList{{forloop.counter}}" class="loa-approvals">
+                                {% for approver in level.list %}
+                                <div class="form-group row approver-line-item" style="">
+                                    <label class="col-md-3 form-control-label">Approver #{{forloop.counter}}</label>
+                                    <div class="col-md-7">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <input type="hidden" name="level" value="{{ level.grouper }}" />
+                                                <select name="approver" class="form-control" required>
+                                                    <option value="">Select Approver</option>
+                                                    {% for user in users %}
+                                                    <option value="{{user.user_id}}"
+                                                        {% if user.user_id == approver.approver_id %} selected
+                                                        {% endif %}>
+                                                        {{user.user.username}} - {{user.role.name}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <!-- <div class="col-md-4">
                                             <div class="custom-control custom-checkbox">
                                                 <input id="customCheck{{level.grouper}}{{forloop.counter}}"
                                                     name="mustapprove" type="checkbox" class="custom-control-input"
@@ -98,30 +103,36 @@
                                                     approve</label>
                                             </div>
                                         </div> -->
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- <div class="col-md-2">
+                                    <!-- <div class="col-md-2">
                                     <button type="button" class="btn btn-default float-right remove-approver"><i class="fa fa-times" style="color: crimson;" aria-hidden="true"></i></button>
                                 </div> -->
+                                </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
-                        </div>
-                        <div id="ApprovalRule{{ level.grouper }}" class="form-group row approval-rule-list" style="">
+                            <div id="ApprovalRule{{ level.grouper }}" class="form-group row approval-rule-list"
+                                style="">
                                 <label class="col-md-3 form-control-label">Rule</label>
                                 <div class="col-md-9">
                                     <div class="row">
                                         <div class="col-md-2">
-                                            <input type="number" name="requiredapproval" min="1" max="{{level.list | length}}" value="{{level.list.0.required_approval}}" class="form-control">
+                                            <input type="number" name="requiredapproval" min="1"
+                                                max="{{level.list | length}}" value="{{level.list.0.required_approval}}"
+                                                class="form-control">
                                         </div>
                                         <p style="margin-top: 10px;">of</p>
                                         <div class="col-md-2">
-                                            <input type="number" name="totalapproval" min="1" max="{{level.list | length}}" value="{{level.list | length}}" class="form-control" disabled>
+                                            <input type="number" name="totalapproval" min="1"
+                                                max="{{level.list | length}}" value="{{level.list | length}}"
+                                                class="form-control" disabled>
                                         </div>
                                         <p style="margin-top: 10px;">must approve</p>
                                     </div>
                                 </div>
                             </div>
-                        <div class="line"></div>
+                            <div class="line"></div>
+                        </div>
                         {% endfor %}
                     </div>
 
@@ -141,62 +152,61 @@
 </div>
 
 <div id="LoaTemplate" class="loa-levels">
-    <div class="line"></div>
-    <div class="form-group row" style="display: none;">
-        <div class="col-md-9 ">
-            <h4 class="float-left">{level}</h4>
+    <div id="LevelBlock{levelindx}">
+        <div class="line"></div>
+        <div class="form-group row" style="display: none;">
+            <div class="col-md-12" style="margin-bottom: 5px;">
+                <h4 class="float-left">{level}</h4>
+                <button type="button" data-level-indx="{levelindx}"
+                    class="btn btn-default remove-level float-right"><i class="fa fa-trash" style="color: #CC0000;"
+                        aria-hidden="true"></i></button>
+            </div>
+            <div class="col-md-9 ml-auto">
+                <button data-indx="{idx}" data-last-indx="{lastindx}" data-level-indx="{levelindx}" type="button"
+                    class="btn btn-primary add-approver float-right"><i class="fa fa-plus" aria-hidden="true"></i> Add
+                    Approver</button>
+            </div>
         </div>
-        <div class="col-md-9 ml-auto">
-            <button data-indx="{idx}" data-last-indx="{lastindx}" data-level-indx="{levelindx}" type="button"
-                class="btn btn-primary add-approver float-right"><i class="fa fa-plus" aria-hidden="true"></i> Add
-                Approver</button>
+        <div id="ApproverList{idx}" class="loa-approvals">
+            <div class="form-group row approver-line-item" style="display: none;">
+                <label class="col-md-3 form-control-label">{lblApprover}</label>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input type="hidden" name="level" value="{levelindx}" />
+                            <select name="approver" class="form-control" required>
+                                <option value="">Select Approver</option>
+                                {% for user in users %}
+                                <option value="{{user.user_id}}">{{user.user.username}} - {{user.role.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div id="ApproverList{idx}" class="loa-approvals">
-        <div class="form-group row approver-line-item" style="display: none;">
-            <label class="col-md-3 form-control-label">{lblApprover}</label>
+
+        <div id="ApprovalRule{levelindx}" class="form-group row approval-rule" style="display: none;">
+            <label class="col-md-3 form-control-label">Rule</label>
             <div class="col-md-9">
                 <div class="row">
-                    <div class="col-md-5">
-                        <input type="hidden" name="level" value="{levelindx}" />
-                        <select name="approver" class="form-control" required>
-                            <option value="">Select Approver</option>
-                            {% for user in users %}
-                            <option value="{{user.user_id}}">{{user.user.username}} - {{user.role.name}}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="col-md-2">
+                        <input type="number" name="requiredapproval" min="1" max="1" value="1" class="form-control">
                     </div>
-                    <!-- <div class="col-md-4">
-                        <div class="custom-control custom-checkbox">
-                            <input id="customCheck{j}{lastindx}" name="mustapprove" type="checkbox"
-                                class="custom-control-input">
-                            <label for="customCheck{j}{lastindx}" class="custom-control-label">Must approve</label>
-                        </div>
-                    </div> -->
+                    <p style="margin-top: 10px;">of</p>
+                    <div class="col-md-2">
+                        <input type="number" name="totalapproval" min="1" max="1" value="1" class="form-control"
+                            disabled>
+                    </div>
+                    <p style="margin-top: 10px;">must approve</p>
                 </div>
             </div>
         </div>
-
+        <div class="line"></div>
     </div>
-    <div id="ApprovalRule{levelindx}" class="form-group row approval-rule" style="display: none;">
-        <label class="col-md-3 form-control-label">Rule</label>
-        <div class="col-md-9">
-            <div class="row">
-                <div class="col-md-2">
-                    <input type="number" name="requiredapproval" min="1" max="1" value="1" class="form-control">
-                </div>
-                <p style="margin-top: 10px;">of</p>
-                <div class="col-md-2">
-                    <input type="number" name="totalapproval" min="1" max="1" value="1" class="form-control" disabled>
-                </div>
-                <p style="margin-top: 10px;">must approve</p>
-            </div>
-        </div>
-    </div>
-    <div class="line"></div>
 </div>
 
-<div id="zmr">
+<div id="LevelSchema">
     <div id="ApproverLineItem{idx}" class="form-group row approver-line" style="display: none;">
         <label class="col-md-3 form-control-label">{lblApprover}</label>
         <div class="col-md-9">
@@ -210,13 +220,6 @@
                         {% endfor %}
                     </select>
                 </div>
-                <!-- <div class="col-md-4">
-                    <div class="custom-control custom-checkbox">
-                        <input id="customCheck{lastindx}{j}" name="mustapprove" type="checkbox"
-                            class="custom-control-input">
-                        <label for="customCheck{lastindx}{j}" class="custom-control-label">Must approve</label>
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
