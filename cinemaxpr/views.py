@@ -21,6 +21,7 @@ def dashboard(request):
 
     memos = MemoDetail.objects.filter(
         businessunit_id=current_user.businessunit_id)
+    purchaserequisitions = PurchaseRequisitionDetail.objects.filter(created_by_id=request.user.id)
 
     pending_count = MemoDetail.objects.filter(
         approvalstatus_id=Status.PENDING.value, created_by_id=request.user.id).count()
@@ -30,7 +31,7 @@ def dashboard(request):
         approvalstatus_id=Status.REJECTED.value, created_by_id=request.user.id).count()
     transactions = TransactionDetail.objects.filter(
         extendeduserObj=request.user.id, transactionstatus=Status.PENDING.value).select_related()
-    return render(request, 'dashboard.htm', {'view': 'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count': approved_count, 'rejected_count': rejected_count, 'transactions': transactions, 'memos': memos})
+    return render(request, 'dashboard.htm', {'view': 'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count': approved_count, 'rejected_count': rejected_count, 'transactions': transactions, 'memos': memos, 'purchaserequisitions': purchaserequisitions})
 
 
 @login_required(login_url='login')
