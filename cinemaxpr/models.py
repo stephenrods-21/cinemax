@@ -131,19 +131,16 @@ class PurchaseRequisitionDetail(models.Model):
 
 class TransactionDetail(models.Model):
     level = models.IntegerField(null=False, default=1)
-    #extendeduserObj = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE)
     extendeduserObj = models.IntegerField(null=False, default=1)
     transactionstatus = models.IntegerField(null=False, default=1)
-    # must_approve = models.BooleanField(default=False)
     required_approval = models.IntegerField(null=False, default=1)
     lineOfApprovalObj = models.IntegerField(null=False, default=0)
     businessunitObj = models.IntegerField(null=False, default=1)
-    #memo = models.IntegerField(null=False, default=1)
-    memoObj = models.ForeignKey(MemoDetail, on_delete=models.CASCADE)
+    memoObj = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
+    purchaseRequisitionDetail = models.ForeignKey(PurchaseRequisitionDetail, blank=True, null=True, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     created_on = models.DateTimeField(null=True)
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
-    #created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 

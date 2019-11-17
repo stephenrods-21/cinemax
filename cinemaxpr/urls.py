@@ -15,5 +15,6 @@ urlpatterns = [
     path('editpurchaserequisition/<int:id>/<int:budgetid>', views.editPurchaseRequisition, name='editpurchaserequisitionById'),
     path('updatepurchaserequisition', views.updateMemo, name='updatepurchaserequisition'),
     path('getDocumentNumber/<int:buid>', views.getDocumentNumber, name='getdocumentnumber'),
-    path('updateTransactionStatus/<int:tid>/<int:isApproved>', views.updateTransactionStatus, name='updateTransactionStatus')
+    path('updateTransactionStatus/<int:tid>/<int:isApproved>', views.updateTransactionStatus, name='updateTransactionStatus'),
+    path('updatePRTransactionStatus/<int:tid>/<int:isApproved>', views.updatePRTransactionStatus, name='updatePRTransactionStatus')
 ]

@@ -2,9 +2,11 @@ $(document).ready(() => {
     var j = 0;
     var lastIndx = 0;
     var levelIndx = 0;
+    var reload = false;
 
     $(document).on('click', '.remove-level', function (e) {
         if (confirm("Are you sure you want to delete this level?")) {
+            reload = true;
             var levelCounter = 0;
             var levelIndx = $(this).attr('data-level-indx');
             $('#LevelBlock' + levelIndx).remove();
@@ -149,7 +151,13 @@ $(document).ready(() => {
             data: { data: JSON.stringify(model), approverList: JSON.stringify(filteredApproverList), approvalRuleList: JSON.stringify(approvalRuleList) },
             context: this,
             success: function (data) {
-                window.location.href = '/lineofapprovals';
+                if (reload) {
+                    window.location.reload();
+                    reload = false;
+                }
+                else
+                    window.location.href = '/lineofapprovals';
+
             },
             complete: function () {
                 $('.ajax-loader').css("visibility", "hidden");
