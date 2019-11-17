@@ -26,8 +26,11 @@ def login(request):
 
         if user is not None:
             auth.login(request, user)
-            request.session['role'] = ExtendedUser.objects.get(
-                user_id=request.user.id).role.name
+            extended_user = ExtendedUser.objects.get(user_id=request.user.id)
+
+            request.session['role'] = extended_user.role.name
+            request.session['entity_type_id'] = extended_user.entity_type_id
+            # request.session['entity_type_id'] = 2
 
             if user.is_superuser:
                 return redirect('admindashboard')
@@ -43,7 +46,7 @@ def login(request):
 def editUser(request, id):
     if id > 0:
         editUser = ExtendedUser.objects.get(id=id)
-        return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'editUser': editUser, 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related(), 'roles': Role.objects.all()})
+        return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'editUser': editUser, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related(), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
     if request.method == "POST":
         userData = json.loads(request.POST['data'])
@@ -55,7 +58,7 @@ def editUser(request, id):
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
 
-    return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related(), 'roles': Role.objects.all()})
+    return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related(), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
@@ -82,48 +85,48 @@ def logoutUser(request):
 @user_passes_test(check_access)
 def adminDashboard(request):
     pending_count = MemoDetail.objects.filter(
-        approvalstatus_id=Status.PENDING.value).count()
+        approvalstatus_id=Status.PENDING.value, entity_type_id=request.session['entity_type_id']).count()
     approved_count = MemoDetail.objects.filter(
-        approvalstatus_id=Status.APPROVED.value).count()
+        approvalstatus_id=Status.APPROVED.value, entity_type_id=request.session['entity_type_id']).count()
     rejected_count = MemoDetail.objects.filter(
-        approvalstatus_id=Status.REJECTED.value).count()
+        approvalstatus_id=Status.REJECTED.value, entity_type_id=request.session['entity_type_id']).count()
     return render(request, 'admin/admindashboard.htm', {'view': 'dashboard', 'title': 'Dashboard', 'pending_count': pending_count, 'approved_count': approved_count, 'rejected_count': rejected_count})
 
 
 @user_passes_test(check_access)
 def manageUsers(request):
-    users = ExtendedUser.objects.all().select_related()
-    return render(request, 'admin/manageusers.htm', {'view': 'manageusers', 'title': 'Manage Users', 'users': users, 'businessunits': businessunit.objects.all(), 'roles': Role.objects.all()})
+    users = ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()
+    return render(request, 'admin/manageusers.htm', {'view': 'manageusers', 'title': 'Manage Users', 'users': users, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
 def businessunits(request):
-    return render(request, 'admin/businessunit.htm', {'view': 'businessunits', 'title': 'Business Unit', 'businessunits': businessunit.objects.all()})
+    return render(request, 'admin/businessunit.htm', {'view': 'businessunits', 'title': 'Business Unit', 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
 def addBusinessUnit(request):
     bu = businessunit(
-        name=request.POST['name'], prefix=request.POST['prefix'], created_by_id=request.user.id)
+        name=request.POST['name'], prefix=request.POST['prefix'], created_by_id=request.user.id, entity_type_id=request.session['entity_type_id'])
     bu.save()
     return redirect('businessunits')
 
 
 @user_passes_test(check_access)
 def roles(request):
-    return render(request, 'admin/roles.htm', {'view': 'roles', 'title': 'Role', 'roles': Role.objects.all()})
+    return render(request, 'admin/roles.htm', {'view': 'roles', 'title': 'Role', 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
 def addRole(request):
-    role = Role(name=request.POST['name'], created_by_id=request.user.id)
+    role = Role(name=request.POST['name'], created_by_id=request.user.id, entity_type_id=request.session['entity_type_id'])
     role.save()
     return redirect('roles')
 
 
 @user_passes_test(check_access)
 def lineOfApproval(request):
-    return render(request, 'admin/lineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'lineofapprovals': LineOfApproval.objects.all()})
+    return render(request, 'admin/lineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'lineofapprovals': LineOfApproval.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
@@ -135,7 +138,7 @@ def editlineOfApproval(request, id):
         maxLevel = LineOfApprovalDetail.objects.filter(
             line_of_approval_id=editLineOfApproval.id).aggregate(Max('level'))
 
-        return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': maxLevel['level__max'], 'editLineOfApproval': editLineOfApproval, 'editLineOfApprovalDetail': editLineOfApprovalDetail, 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
+        return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': maxLevel['level__max'], 'editLineOfApproval': editLineOfApproval, 'editLineOfApprovalDetail': editLineOfApprovalDetail, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()})
 
     if request.method == "POST":
         loaData = json.loads(request.POST['data'])
@@ -158,7 +161,7 @@ def editlineOfApproval(request, id):
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
 
-    return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': 0, 'businessunits': businessunit.objects.all(), 'users': ExtendedUser.objects.all().select_related()})
+    return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': 0, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()})
 
 
 @user_passes_test(check_access)

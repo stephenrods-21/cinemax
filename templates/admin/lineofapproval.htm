@@ -20,7 +20,8 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Name</label>
-                                <input type="text" placeholder="Business unit name" name="name" class="form-control" required>
+                                <input type="text" placeholder="Business unit name" name="name" class="form-control"
+                                    required>
                             </div>
                             <div class="form-group">
                                 <label>Prefix</label>
@@ -62,7 +63,11 @@
                             <td><a href="/editlineofapprovals/{{lineofapproval.id}}">{{lineofapproval.name}}</a></td>
                             <td>{{lineofapproval.businessunit.name}}</td>
                             <td>{% if lineofapproval.is_active == 1 %} Yes {% else %} No {% endif %}</td>
-                            <td><button class="btn btn-danger delete-loa" data-loa-id="{{lineofapproval.id}}">Delete</button></td>
+                            <td>
+                                <button type="button" data-loa-id="{{lineofapproval.id}}"
+                                    class="btn btn-default delete-loa float-right"><i class="fa fa-trash"
+                                        style="color: #CC0000;" aria-hidden="true"></i></button>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

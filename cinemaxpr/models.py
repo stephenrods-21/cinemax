@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+class EntityType(models.Model):
+    entity_name = models.CharField(max_length=50, null=False)
 
 class businessunit(models.Model):
     name = models.CharField(max_length=75, null=False)
@@ -14,6 +16,7 @@ class businessunit(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -27,6 +30,7 @@ class Role(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
 
 class ExtendedUser(models.Model):
@@ -39,6 +43,7 @@ class ExtendedUser(models.Model):
     created_on = models.DateTimeField(null=True)
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
 
 class LineOfApproval(models.Model):
@@ -51,6 +56,7 @@ class LineOfApproval(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -67,6 +73,7 @@ class LineOfApprovalDetail(models.Model):
     created_on = models.DateTimeField(null=True)
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
 
 class ApprovalStatus(models.Model):
@@ -77,6 +84,7 @@ class ApprovalStatus(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -89,6 +97,7 @@ class BudgetDetail(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
 
 class MemoDetail(models.Model):
@@ -103,6 +112,7 @@ class MemoDetail(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.topic
@@ -117,6 +127,7 @@ class PurchaseRequisitionDetail(models.Model):
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
 class TransactionDetail(models.Model):
     level = models.IntegerField(null=False, default=1)
@@ -133,5 +144,6 @@ class TransactionDetail(models.Model):
     created_on = models.DateTimeField(null=True)
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
     #created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 

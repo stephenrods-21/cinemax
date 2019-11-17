@@ -4,7 +4,7 @@ $(document).ready(() => {
     var levelIndx = 0;
 
     $(document).on('click', '.remove-level', function (e) {
-        if (confirm("Are you sure you want to delete the level?")) {
+        if (confirm("Are you sure you want to delete this level?")) {
             var levelCounter = 0;
             var levelIndx = $(this).attr('data-level-indx');
             $('#LevelBlock' + levelIndx).remove();
@@ -53,20 +53,21 @@ $(document).ready(() => {
     });
 
     $(document).on('click', '.delete-loa', function (e) {
-        e.preventDefault();
-        var loaId = $(this).attr('data-loa-id');
-        $.ajax({
-            headers: { "X-CSRFToken": getCookie("csrftoken") },
-            type: "POST",
-            url: "/deletelineofapproval/" + loaId,
-            data: {},
-            context: this,
-            success: function (data) {
-                console.log(data);
-                window.location.href = '/lineofapprovals';
-            }
-        });
-
+        if (confirm("Are you sure you want to delete this line of approval?")) {
+            e.preventDefault();
+            var loaId = $(this).attr('data-loa-id');
+            $.ajax({
+                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                type: "POST",
+                url: "/deletelineofapproval/" + loaId,
+                data: {},
+                context: this,
+                success: function (data) {
+                    console.log(data);
+                    window.location.href = '/lineofapprovals';
+                }
+            });
+        }
     });
 
     $(document).on('click', '.add-approver', function (e) {
