@@ -41,43 +41,6 @@
         class="sidebar-toggler text-gray-500 mr-4 mr-lg-5 lead"><i class="fas fa-align-left"></i></a><a href="#"
         class="navbar-brand font-weight-bold text-uppercase text-base">{{title}}</a>
       <ul class="ml-auto d-flex align-items-center list-unstyled mb-0">
-        <!-- <li class="nav-item">
-            <form id="searchForm" class="ml-auto d-none d-lg-block">
-              <div class="form-group position-relative mb-0">
-                <button type="submit" style="top: -3px; left: 0;" class="position-absolute bg-white border-0 p-0"><i class="o-search-magnify-1 text-gray text-lg"></i></button>
-                <input type="search" placeholder="Search ..." class="form-control form-control-sm border-0 no-shadow pl-4">
-              </div>
-            </form>
-          </li> -->
-        <!-- <li class="nav-item dropdown mr-3"><a id="notifications" href="http://example.com" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle text-gray-400 px-1"><i class="fa fa-bell"></i><span class="notification-icon"></span></a>
-            <div aria-labelledby="notifications" class="dropdown-menu"><a href="#" class="dropdown-item">
-                <div class="d-flex align-items-center">
-                  <div class="icon icon-sm bg-violet text-white"><i class="fab fa-twitter"></i></div>
-                  <div class="text ml-2">
-                    <p class="mb-0">You have 2 followers</p>
-                  </div>
-                </div></a><a href="#" class="dropdown-item"> 
-                <div class="d-flex align-items-center">
-                  <div class="icon icon-sm bg-green text-white"><i class="fas fa-envelope"></i></div>
-                  <div class="text ml-2">
-                    <p class="mb-0">You have 6 new messages</p>
-                  </div>
-                </div></a><a href="#" class="dropdown-item">
-                <div class="d-flex align-items-center">
-                  <div class="icon icon-sm bg-blue text-white"><i class="fas fa-upload"></i></div>
-                  <div class="text ml-2">
-                    <p class="mb-0">Server rebooted</p>
-                  </div>
-                </div></a><a href="#" class="dropdown-item">
-                <div class="d-flex align-items-center">
-                  <div class="icon icon-sm bg-violet text-white"><i class="fab fa-twitter"></i></div>
-                  <div class="text ml-2">
-                    <p class="mb-0">You have 2 followers</p>
-                  </div>
-                </div></a>
-              <div class="dropdown-divider"></div><a href="#" class="dropdown-item text-center"><small class="font-weight-bold headings-font-family text-uppercase">View all notifications</small></a>
-            </div>
-          </li> -->
         <li class="nav-item dropdown ml-auto"><a id="userInfo" href="http://example.com" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle"><img
               src="{% static 'admin/img/admin-avatar.jpg' %}" alt="" style="max-width: 2.5rem;"
@@ -103,8 +66,6 @@
         <li class="sidebar-list-item"><a href="{% url 'memo' %}"
             class="sidebar-link text-muted {% if view == 'memo' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Memo</span></a></li>
-        {% endif %}
-        {% if request.session.role == "PR Manager" %}
         <li class="sidebar-list-item"><a href="{% url 'purchaserequisitionmemo' %}"
             class="sidebar-link text-muted {% if view == 'approvedmemo' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Approved Memo's</span></a></li>
@@ -112,27 +73,7 @@
             class="sidebar-link text-muted {% if view == 'purchaserequisition' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Purchase Requisition</span></a></li>
         {% endif %}
-        <!-- <li class="sidebar-list-item"><a href="tables.html" class="sidebar-link text-muted"><i class="o-table-content-1 mr-3 text-gray"></i><span>Tables</span></a></li>
-              <li class="sidebar-list-item"><a href="forms.html" class="sidebar-link text-muted"><i class="o-survey-1 mr-3 text-gray"></i><span>Forms</span></a></li> -->
-        <!-- <li class="sidebar-list-item"><a href="#" data-toggle="collapse" data-target="#pages" aria-expanded="false" aria-controls="pages" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Pages</span></a>
-            <div id="pages" class="collapse">
-              <ul class="sidebar-menu list-unstyled border-left border-primary border-thick">
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page one</a></li>
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page two</a></li>
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page three</a></li>
-                <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted pl-lg-5">Page four</a></li>
-              </ul>
-            </div>
-          </li>
-              <li class="sidebar-list-item"><a href="login.html" class="sidebar-link text-muted"><i class="o-exit-1 mr-3 text-gray"></i><span>Login</span></a></li> -->
       </ul>
-      <!-- <div class="text-gray-400 text-uppercase px-3 px-lg-4 py-4 font-weight-bold small headings-font-family">EXTRAS</div>
-        <ul class="sidebar-menu list-unstyled">
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-database-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-imac-screen-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-paperwork-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-              <li class="sidebar-list-item"><a href="#" class="sidebar-link text-muted"><i class="o-wireframe-1 mr-3 text-gray"></i><span>Demo</span></a></li>
-        </ul> -->
     </div>
     <div class="page-holder w-100 d-flex flex-wrap">
       <div class="container-fluid px-xl-5">

@@ -10,6 +10,7 @@ class businessunit(models.Model):
     name = models.CharField(max_length=75, null=False)
     prefix = models.CharField(max_length=25, null=False)
     documentno = models.IntegerField(default=1000)
+    is_visible = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_on = models.DateTimeField(null=True)
@@ -35,7 +36,7 @@ class Role(models.Model):
 
 class ExtendedUser(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    businessunit = models.ForeignKey(businessunit, on_delete=models.CASCADE)
+    businessunit = models.ForeignKey(businessunit, blank=True, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.CharField(max_length=75, null=False)
     is_active = models.BooleanField(default=True)
@@ -48,7 +49,7 @@ class ExtendedUser(models.Model):
 
 class LineOfApproval(models.Model):
     name = models.CharField(max_length=75, null=False)
-    businessunit = models.ForeignKey(businessunit, on_delete=models.CASCADE)
+    businessunit = models.ForeignKey(businessunit, blank=True, on_delete=models.CASCADE)
     no_of_approver = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -103,7 +104,7 @@ class BudgetDetail(models.Model):
 class MemoDetail(models.Model):
     documentno = models.CharField(max_length=50, null=False)
     topic = models.CharField(max_length=500, null=False)
-    businessunit = models.ForeignKey(businessunit, on_delete=models.CASCADE)
+    businessunit = models.ForeignKey(businessunit, blank=True, on_delete=models.CASCADE)
     approvalstatus = models.ForeignKey(ApprovalStatus, on_delete=models.CASCADE)
     budget = models.ForeignKey(BudgetDetail, blank=True, null=True, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
@@ -135,7 +136,7 @@ class TransactionDetail(models.Model):
     transactionstatus = models.IntegerField(null=False, default=1)
     required_approval = models.IntegerField(null=False, default=1)
     lineOfApprovalObj = models.IntegerField(null=False, default=0)
-    businessunitObj = models.IntegerField(null=False, default=1)
+    businessunitObj = models.IntegerField(blank=True, null=True)
     memoObj = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
     purchaseRequisitionDetail = models.ForeignKey(PurchaseRequisitionDetail, blank=True, null=True, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)

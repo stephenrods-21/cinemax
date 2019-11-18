@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
+from django.db.models import Q
 from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, PurchaseRequisitionDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
 import json
 from cinemax.enums import Status
@@ -20,7 +21,7 @@ def dashboard(request):
     current_user = ExtendedUser.objects.get(user_id=request.user.id)
 
     memos = MemoDetail.objects.filter(
-        businessunit_id=current_user.businessunit_id)
+        Q(businessunit_id=current_user.businessunit_id) | Q(created_by_id=request.user.id))
     purchaserequisitions = PurchaseRequisitionDetail.objects.filter(created_by_id=request.user.id)
 
     pending_count = MemoDetail.objects.filter(
@@ -43,7 +44,7 @@ def memo(request):
 def editMemo(request, id):
     if id > 0:
         editMemo = MemoDetail.objects.get(id=id)
-        return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit Memo', 'editMemo': editMemo, 'businessunits': businessunit.objects.all()})
+        return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit Memo', 'editMemo': editMemo, 'businessunits': businessunit.objects.filter(Q(is_visible=False) | Q(id=request.session['bu_id']))})
 
     if request.method == "POST":
         memoData = json.loads(request.POST['data'])
@@ -82,7 +83,7 @@ def editMemo(request, id):
             memo.save()
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
-    return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit memo', 'businessunits': businessunit.objects.all()})
+    return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit memo', 'businessunits': businessunit.objects.filter(Q(is_visible=False) | Q(id=request.session['bu_id']))})
 
 
 @login_required(login_url='login')

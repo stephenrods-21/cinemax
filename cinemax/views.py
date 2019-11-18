@@ -30,6 +30,7 @@ def login(request):
 
             request.session['role'] = extended_user.role.name
             request.session['entity_type_id'] = extended_user.entity_type_id
+            request.session['bu_id'] = extended_user.businessunit_id
             # request.session['entity_type_id'] = 2
 
             if user.is_superuser:
@@ -46,7 +47,7 @@ def login(request):
 def editUser(request, id):
     if id > 0:
         editUser = ExtendedUser.objects.get(id=id)
-        return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'editUser': editUser, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related(), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
+        return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'editUser': editUser, 'businessunits': businessunit.objects.filter(is_visible=True, entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related(), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
     if request.method == "POST":
         userData = json.loads(request.POST['data'])
@@ -58,7 +59,7 @@ def editUser(request, id):
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
 
-    return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related(), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
+    return render(request, 'admin/edituser.htm', {'view': 'manageusers', 'title': 'Manage User', 'businessunits': businessunit.objects.filter(is_visible=True, entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related(), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
@@ -101,7 +102,7 @@ def manageUsers(request):
 
 @user_passes_test(check_access)
 def businessunits(request):
-    return render(request, 'admin/businessunit.htm', {'view': 'businessunits', 'title': 'Business Unit', 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id'])})
+    return render(request, 'admin/businessunit.htm', {'view': 'businessunits', 'title': 'Business Unit', 'businessunits': businessunit.objects.filter(is_visible=True, entity_type_id=request.session['entity_type_id'])})
 
 
 @user_passes_test(check_access)
@@ -138,7 +139,7 @@ def editlineOfApproval(request, id):
         maxLevel = LineOfApprovalDetail.objects.filter(
             line_of_approval_id=editLineOfApproval.id).aggregate(Max('level'))
 
-        return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': maxLevel['level__max'], 'editLineOfApproval': editLineOfApproval, 'editLineOfApprovalDetail': editLineOfApprovalDetail, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()})
+        return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': maxLevel['level__max'], 'editLineOfApproval': editLineOfApproval, 'editLineOfApprovalDetail': editLineOfApprovalDetail, 'businessunits': businessunit.objects.filter(is_visible=True, entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()})
 
     if request.method == "POST":
         loaData = json.loads(request.POST['data'])
@@ -161,7 +162,7 @@ def editlineOfApproval(request, id):
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
 
-    return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': 0, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()})
+    return render(request, 'admin/editlineofapproval.htm', {'view': 'lineofapprovals', 'title': 'Line Of Approval', 'max_level': 0, 'businessunits': businessunit.objects.filter(is_visible=True, entity_type_id=request.session['entity_type_id']), 'users': ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()})
 
 
 @user_passes_test(check_access)
