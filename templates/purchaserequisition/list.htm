@@ -4,7 +4,7 @@
 <section class="py-3">
     <div class="row">
         <div class="col-lg-12 mb-4">
-            <button type="button" onclick="location.href = '/editmemo/0'" class="btn btn-primary float-right"><i
+            <button type="button" onclick="location.href = 'editpurchaserequisition/0/0'" class="btn btn-primary float-right"><i
                     class="fa fa-plus" aria-hidden="true"></i> New PR</button>
         </div>
     </div>
@@ -30,8 +30,8 @@
                         {% for purchaserequisition in purchaserequisitions %}
                         <tr>
                             <td scope="">PR-{{purchaserequisition.id}}</td>
-                            <td>{{purchaserequisition.title}}</td>
-                            <td>{{purchaserequisition.budgetDetail.amount}}</td>
+                            <td><a href="/editpurchaserequisition/{{purchaserequisition.id}}/0">{{purchaserequisition.title}}</a></td>
+                            <td>{{purchaserequisition.actual_amount}}</td>
                             <td>
                                 <div
                                     class="bg-white shadow roundy px-2 py-2 d-flex align-items-center justify-content-between mb-0">

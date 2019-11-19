@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Q
-from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, PurchaseRequisitionDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
+from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
 import json
 from cinemax.enums import Status
 from django.http import HttpResponse
@@ -22,7 +22,8 @@ def dashboard(request):
 
     memos = MemoDetail.objects.filter(
         Q(businessunit_id=current_user.businessunit_id) | Q(created_by_id=request.user.id))
-    purchaserequisitions = PurchaseRequisitionDetail.objects.filter(created_by_id=request.user.id)
+    purchaserequisitions = PurchaseRequisitionDetail.objects.filter(
+        created_by_id=request.user.id)
 
     pending_count = MemoDetail.objects.filter(
         approvalstatus_id=Status.PENDING.value, created_by_id=request.user.id).count()
@@ -78,7 +79,7 @@ def editMemo(request, id):
                                                 extendeduserObj=loaDetail.approver_id, memoObj_id=memo.id, transactionstatus=Status.PENDING.value)
                 transaction.save()
         else:
-            #If BU does not have LOA then set status to Approved
+            # If BU does not have LOA then set status to Approved
             memo.approvalstatus_id = Status.APPROVED.value
             memo.save()
 
@@ -124,37 +125,88 @@ def purchaseRequisitionMemo(request):
 def editPurchaseRequisition(request, id, budgetid):
     edit_purchase_requisition = PurchaseRequisitionDetail()
     edit_purchase_requisition.id = 0
-    edit_purchase_requisition.budgetDetail = BudgetDetail.objects.get(id=budgetid)
+    edit_purchase_requisition.budget_id = 0
+    edit_purchase_requisition.vendor_name = ""
+    edit_purchase_requisition.vendor_account = ""
+    if budgetid > 0:
+        edit_purchase_requisition.budgetDetail = BudgetDetail.objects.get(
+            id=budgetid)
 
     if id > 0:
-        edit_purchase_requisition = PurchaseRequisitionDetail.objects.get(id=id)
-        return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit Memo', 'editMemo': editMemo, 'businessunits': businessunit.objects.all()})
+        edit_purchase_requisition = PurchaseRequisitionDetail.objects.get(
+            id=id)
+        line_items = PurchaseRequisitionLineDetail.objects.filter(purchaseRequisitionDetail_id=edit_purchase_requisition.id)
+        return render(request, 'purchaserequisition/editpurchaserequisition.htm', {'view': 'purchaserequisition', 'title': 'Edit Purchase Requisition', 'editPurchaseRequisition': edit_purchase_requisition, 'line_items': line_items})
 
     if request.method == "POST":
         purchaseRequisitionData = json.loads(request.POST['data'])
+        purchaseRequisitionLineData = json.loads(request.POST['lineitems'])
 
-        purchaseRequisition = PurchaseRequisitionDetail(
-            title=purchaseRequisitionData['title'], budgetDetail_id=budgetid, created_by_id=request.user.id, status=ApprovalStatus.objects.get(id=Status.PENDING.value))
+        if budgetid > 0:
+            purchaseRequisition = PurchaseRequisitionDetail(
+                vendor_name=purchaseRequisitionData['vendorname'],
+                vendor_account=purchaseRequisitionData['vendoraccount'],
+                actual_amount=purchaseRequisitionData['amount'],
+                title=purchaseRequisitionData['title'], budgetDetail_id=budgetid, created_by_id=request.user.id, status=ApprovalStatus.objects.get(id=Status.PENDING.value))
+        else:
+            purchaseRequisition = PurchaseRequisitionDetail(
+                vendor_name=purchaseRequisitionData['vendorname'],
+                vendor_account=purchaseRequisitionData['vendoraccount'],
+                actual_amount=purchaseRequisitionData['amount'],
+                title=purchaseRequisitionData['title'], created_by_id=request.user.id, status=ApprovalStatus.objects.get(id=Status.PENDING.value))
+
         purchaseRequisition.save()
 
+        # entry for line items
+        for lineitem in purchaseRequisitionLineData:
+            if lineitem['lineid'] == "":
+                lineitem = PurchaseRequisitionLineDetail(description=lineitem['linedescription'], line_amount=lineitem['lineamount'], remark=lineitem['lineremark'],
+                                                         created_by_id=request.user.id,
+                                                         status_id=Status.PENDING.value,
+                                                         purchaseRequisitionDetail_id=purchaseRequisition.id
+                                                         )
+                lineitem.save()
+
         # get LOA for based on Business Unit
-        memo = MemoDetail.objects.get(budget_id=budgetid)
+        # memo = MemoDetail.objects.get(budget_id=budgetid)
 
-        if(LineOfApproval.objects.filter(businessunit_id=memo.businessunit_id).count() > 0):
-            lineOfApproval = LineOfApproval.objects.get(
-                businessunit_id=memo.businessunit_id)
-            lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
-                line_of_approval_id=lineOfApproval.id, level=1)
+        # if(LineOfApproval.objects.filter(businessunit_id=memo.businessunit_id).count() > 0):
+        #     lineOfApproval = LineOfApproval.objects.get(
+        #         businessunit_id=memo.businessunit_id)
+        #     lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
+        #         line_of_approval_id=lineOfApproval.id, level=1)
 
-            # from level 1 make entry in transactions table for LOA
-            for loaDetail in lineOfApprovalDetail:
-                transaction = TransactionDetail(level=loaDetail.level, required_approval=loaDetail.required_approval,
-                                                businessunitObj=lineOfApproval.businessunit_id,
-                                                lineOfApprovalObj=lineOfApproval.id,
-                                                extendeduserObj=loaDetail.approver_id, purchaseRequisitionDetail_id=purchaseRequisition.id, transactionstatus=Status.PENDING.value)
-                transaction.save()
+        #     # from level 1 make entry in transactions table for LOA
+        #     for loaDetail in lineOfApprovalDetail:
+        #         transaction = TransactionDetail(level=loaDetail.level, required_approval=loaDetail.required_approval,
+        #                                         businessunitObj=lineOfApproval.businessunit_id,
+        #                                         lineOfApprovalObj=lineOfApproval.id,
+        #                                         extendeduserObj=loaDetail.approver_id, purchaseRequisitionDetail_id=purchaseRequisition.id, transactionstatus=Status.PENDING.value)
+        #         transaction.save()
     return render(request, 'purchaserequisition/editpurchaserequisition.htm', {'view': 'purchaserequisition', 'title': 'Edit Purchase Requisition', 'editPurchaseRequisition': edit_purchase_requisition})
 
+def updatePurchaseRequisition(request):
+    if request.method == "POST":
+        purchaseRequisitionData = json.loads(request.POST['data'])
+        purchaseRequisitionLineData = json.loads(request.POST['lineitems'])
+
+        pr_detail = PurchaseRequisitionDetail.objects.get(id=purchaseRequisitionData['id'])
+        pr_detail.title = purchaseRequisitionData['title']
+        pr_detail.vendor_name = purchaseRequisitionData['vendorname']
+        pr_detail.vendor_account = purchaseRequisitionData['vendoraccount']
+        pr_detail.save()
+
+        # entry for line items
+        for lineitem in purchaseRequisitionLineData:
+            if lineitem['lineid'] == "":
+                lineitem = PurchaseRequisitionLineDetail(description=lineitem['linedescription'], line_amount=lineitem['lineamount'], remark=lineitem['lineremark'],
+                                                         created_by_id=request.user.id,
+                                                         status_id=Status.PENDING.value,
+                                                         purchaseRequisitionDetail_id=pr_detail.id
+                                                         )
+                lineitem.save()
+
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 def getDocumentNumber(request, buid):
     bu = businessunit.objects.get(id=buid)
@@ -171,20 +223,22 @@ def updatePRTransactionStatus(request, tid, isApproved):
     else:
         transaction.transactionstatus = Status.REJECTED.value
         transaction.save()
-    
+
     if isApproved == 0:
-        #Get PR Details & pending pr transactions
-        pr_detail = PurchaseRequisitionDetail.objects.get(id=transaction.purchaseRequisitionDetail_id)
+        # Get PR Details & pending pr transactions
+        pr_detail = PurchaseRequisitionDetail.objects.get(
+            id=transaction.purchaseRequisitionDetail_id)
         pending_transactions = TransactionDetail.objects.filter(
             purchaseRequisitionDetail_id=pr_detail.id, level=transaction.level, transactionstatus=Status.PENDING.value)
-        
+
         if pending_transactions.count() >= transaction.required_approval:
             return HttpResponse(json.dumps({'status': "waiting for others"}), content_type="application/json")
         else:
             pr_detail.status_id = Status.REJECTED.value
             pr_detail.save()
 
-            extendeduser = ExtendedUser.objects.get(user_id=pr_detail.created_by_id)
+            extendeduser = ExtendedUser.objects.get(
+                user_id=pr_detail.created_by_id)
             subject = 'PR Rejected'
             message = settings.REJECTED_EMAIL_TEMPLATE.format(
                 extendeduser.user.username, pr_detail.title)
@@ -197,7 +251,8 @@ def updatePRTransactionStatus(request, tid, isApproved):
         return HttpResponse(json.dumps({'status': "Waitng for others"}), content_type="application/json")
 
     elif isApproved == 1:
-        pr_detail = PurchaseRequisitionDetail.objects.get(id=transaction.purchaseRequisitionDetail_id)
+        pr_detail = PurchaseRequisitionDetail.objects.get(
+            id=transaction.purchaseRequisitionDetail_id)
         approved_transactions = TransactionDetail.objects.filter(
             purchaseRequisitionDetail_id=pr_detail.id,
             level=transaction.level,
@@ -225,11 +280,13 @@ def updatePRTransactionStatus(request, tid, isApproved):
                 transaction_detail.save()
         else:
             print("NO MORE LOA LEVEL, SO SET TRANSACTION STATUS TO APPROVED")
-            pr_details = PurchaseRequisitionDetail.objects.get(id=transaction.purchaseRequisitionDetail_id)
+            pr_details = PurchaseRequisitionDetail.objects.get(
+                id=transaction.purchaseRequisitionDetail_id)
             pr_details.status_id = Status.APPROVED.value
             pr_details.save()
 
-            extendeduser = ExtendedUser.objects.get(user_id=pr_details.created_by_id)
+            extendeduser = ExtendedUser.objects.get(
+                user_id=pr_details.created_by_id)
 
             subject = "PR Approved By CEO"
             message = settings.APPROVED_EMAIL_TEMPLATE.format(
@@ -238,9 +295,6 @@ def updatePRTransactionStatus(request, tid, isApproved):
             recipient_list = [extendeduser.email]
             print(message, extendeduser.email)
             send_mail(subject, message, email_from, recipient_list)
-
-
-        
 
 
 def updateTransactionStatus(request, tid, isApproved):

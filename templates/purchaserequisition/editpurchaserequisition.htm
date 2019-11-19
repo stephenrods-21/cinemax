@@ -17,11 +17,27 @@
                     <input type="hidden" name="id" value="{{editPurchaseRequisition.id}}">
                     <input type="hidden" name="budgetid" value="{{editPurchaseRequisition.budgetDetail.id}}">
                     <div class="form-group row">
-                        <label class="col-md-3 form-control-label">Topic</label>
+                        <label class="col-md-3 form-control-label">PR Name</label>
                         <div class="col-md-9">
-                            <input type="text" name="title" value="{{editPurchaseRequisition.title}}" class="form-control" required>
+                            <input type="text" name="title" value="{{editPurchaseRequisition.title}}"
+                                class="form-control" required>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Vendor Name</label>
+                        <div class="col-md-9">
+                            <input type="text" name="vendorname" value="{{editPurchaseRequisition.vendor_name}}"
+                                class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Vendor Account</label>
+                        <div class="col-md-9">
+                            <input type="text" name="vendoraccount" value="{{editPurchaseRequisition.vendor_account}}"
+                                class="form-control" required>
+                        </div>
+                    </div>
+
                     <div class="line"></div>
 
                     <div class="row" style="margin-bottom: 25px;">
@@ -37,17 +53,92 @@
                     <div class="row form-group">
                         <label class="col-md-3 form-control-label">Estimated Budget</label>
                         <div class="col-md-9 input-group">
-                            <input type="text" name="amount" value="{{editPurchaseRequisition.budgetDetail.amount}}" 
-                                class="form-control"  {% if editPurchaseRequisition.budget_id > 0  %} disabled {% endif %}>
+                            <input type="text" name="amount" value="{{editPurchaseRequisition.budgetDetail.amount}}"
+                                class="form-control" {% if editPurchaseRequisition.budgetDetail.id > 0  %} disabled
+                                {% endif %}>
                             <div class="input-group-append"><span class="input-group-text">THB</span></div>
                         </div>
                     </div>
+
+                    <div class="line"></div>
+
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col-md-12">
+                            <h5 class="col-md-9 float-left">PR Line Items</h4>
+                                <button id="add_row" data-last-indx="{{line_items | length}}" type="button"
+                                    class="btn btn-primary float-right"><i class="fa fa-plus" aria-hidden="true"></i>
+                                    Add
+                                    Line Item</button>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-hover" id="tab_logic">
+                                <thead>
+                                    <tr>
+                                        <!-- <th class="text-center"> # </th> -->
+                                        <th class="text-center"> Description </th>
+                                        <th class="text-center"> Line Amount </th>
+                                        <th class="text-center"> Remark </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tab_logic">
+                                        {% if line_items|length == 0 %}
+                                        <tr id='addr{{forloop.counter}}' class="pr-line-item">
+                                                <!-- <td>{{forloop.counter}}</td> -->
+                                                <input type="hidden" name="lineid" value="">
+                                                <td><input type="text" name='linedescription' placeholder='Description'
+                                                        class="form-control" value="{{item.description}}" required /></td>
+                                                <td><input type="number" name='lineamount' value="{{item.line_amount}}"
+                                                        placeholder='amount' class="form-control amount" step="0.00" min="0"
+                                                        required />
+                                                </td>
+                                                <td><input type="text" name='lineremark' value="{{item.remark}}" placeholder=''
+                                                        class="form-control remark" /></td>
+                                            </tr>
+                                    </tr>
+                                    {% endif %}
+                                    {% for item in line_items %}
+                                    <tr id='addr{{forloop.counter}}' class="pr-line-item">
+                                        <!-- <td>{{forloop.counter}}</td> -->
+                                        <input type="hidden" name="lineid" value="{{item.id}}">
+                                        <td><input type="text" name='linedescription' placeholder='Description'
+                                                class="form-control" value="{{item.description}}" required /></td>
+                                        <td><input type="number" name='lineamount' value="{{item.line_amount}}"
+                                                placeholder='amount' class="form-control amount" step="0.00" min="0"
+                                                required />
+                                        </td>
+                                        <td><input type="text" name='lineremark' value="{{item.remark}}" placeholder=''
+                                                class="form-control remark" /></td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr id='addr{{line_items | length | add:1}}' class="pr-line-item"></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- <div class="row clearfix">
+                        <div class="col-md-12">
+                            <button id="add_row" type="button" class="btn btn-default pull-left">Add Row</button>
+                            <button id='delete_row' type="button" class="pull-right btn btn-default">Delete Row</button>
+                        </div>
+                    </div> -->
+
+
+
+
+
+
+
+
 
                     <div class="form-group row">
                         <div class="col-md-9 ml-auto">
                             <button type="button" onclick="location.href = '/purchaserequisition/memo'"
                                 class="btn btn-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">{% if editPurchaseRequisition.id > 0 %} Save changes {% else %} Submit for approval {% endif %}</button>
+                            <button type="submit" class="btn btn-primary">{% if editPurchaseRequisition.id > 0 %} Save
+                                changes {% else %} Submit for approval {% endif %}</button>
                         </div>
                     </div>
                 </form>

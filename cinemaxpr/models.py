@@ -120,7 +120,29 @@ class MemoDetail(models.Model):
 
 class PurchaseRequisitionDetail(models.Model):
     title = models.CharField(max_length=150, null=False)
-    budgetDetail = models.ForeignKey(BudgetDetail, on_delete=models.CASCADE)
+    budgetDetail = models.ForeignKey(BudgetDetail, blank=True, null=True, on_delete=models.CASCADE)
+    actual_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    approved_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    require_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    vendor_name = models.CharField(max_length=150, null=True)
+    vendor_account = models.CharField(max_length=150, null=True)
+    status = models.ForeignKey(ApprovalStatus, on_delete=models.CASCADE)
+    is_deleted = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    deadline_on = models.DateTimeField(null=True)
+    modified_on = models.DateTimeField(null=True)
+    deleted_on = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+class PurchaseRequisitionLineDetail(models.Model):
+    description = models.CharField(max_length=150, null=False)
+    purchaseRequisitionDetail = models.ForeignKey(PurchaseRequisitionDetail, on_delete=models.CASCADE)
+    line_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    remark = models.CharField(max_length=250, null=True)
     status = models.ForeignKey(ApprovalStatus, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -139,6 +161,7 @@ class TransactionDetail(models.Model):
     businessunitObj = models.IntegerField(blank=True, null=True)
     memoObj = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
     purchaseRequisitionDetail = models.ForeignKey(PurchaseRequisitionDetail, blank=True, null=True, on_delete=models.CASCADE)
+    purchaseRequisitionLineDetail = models.ForeignKey(PurchaseRequisitionLineDetail, blank=True, null=True, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     created_on = models.DateTimeField(null=True)
     modified_on = models.DateTimeField(null=True)
