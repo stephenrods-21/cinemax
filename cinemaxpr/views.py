@@ -188,22 +188,27 @@ def editPurchaseRequisition(request, id, budgetid):
                                                          )
                 lineitem.save()
 
-        # get LOA for based on Business Unit
-        # memo = MemoDetail.objects.get(budget_id=budgetid)
+        #get LOA for based on Business Unit
+        memo = MemoDetail.objects.get(budget_id=budgetid)
 
-        # if(LineOfApproval.objects.filter(businessunit_id=memo.businessunit_id).count() > 0):
-        #     lineOfApproval = LineOfApproval.objects.get(
-        #         businessunit_id=memo.businessunit_id)
-        #     lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
-        #         line_of_approval_id=lineOfApproval.id, level=1)
+        if(LineOfApproval.objects.filter(businessunit_id=memo.businessunit_id).count() > 0):
+            lineOfApproval = LineOfApproval.objects.get(
+                businessunit_id=memo.businessunit_id)
+            lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
+                line_of_approval_id=lineOfApproval.id, level=1)
 
-        #     # from level 1 make entry in transactions table for LOA
-        #     for loaDetail in lineOfApprovalDetail:
-        #         transaction = TransactionDetail(level=loaDetail.level, required_approval=loaDetail.required_approval,
-        #                                         businessunitObj=lineOfApproval.businessunit_id,
-        #                                         lineOfApprovalObj=lineOfApproval.id,
-        #                                         extendeduserObj=loaDetail.approver_id, purchaseRequisitionDetail_id=purchaseRequisition.id, transactionstatus=Status.PENDING.value)
-        #         transaction.save()
+            # from level 1 make entry in transactions table for LOA
+            for loaDetail in lineOfApprovalDetail:
+                transaction = TransactionDetail(level=loaDetail.level, required_approval=loaDetail.required_approval,
+                                                businessunitObj=lineOfApproval.businessunit_id,
+                                                lineOfApprovalObj=lineOfApproval.id,
+                                                extendeduserObj=loaDetail.approver_id, purchaseRequisitionDetail_id=purchaseRequisition.id, transactionstatus=Status.PENDING.value)
+                transaction.save()
+        else:
+            # If PR does not have LOA then set status to Approved
+            purchaseRequisition.status_id = Status.APPROVED.value
+            purchaseRequisition.save()
+
     return render(request, 'purchaserequisition/editpurchaserequisition.htm', {'view': 'purchaserequisition', 'title': 'Edit Purchase Requisition', 'editPurchaseRequisition': edit_purchase_requisition})
 
 def updatePurchaseRequisition(request):

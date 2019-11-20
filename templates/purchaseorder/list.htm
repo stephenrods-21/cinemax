@@ -1,0 +1,60 @@
+{% extends 'base.htm' %}
+
+{% block content %}
+<section class="py-3">
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+        </div>
+    </div>
+</section>
+
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="text-uppercase mb-0">All Purchase orders</h6>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>PO #</th>
+                            <th>Title</th>
+                            <th>Created By</th>
+                            <th>Status</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for purchaseorder in purchaseorders %}
+                        <tr>
+                            <td>PO{{purchaseorder.poid}}</td>
+                            <td>{{purchaseorder.title}}</td>
+                            <td>{{purchaseorder.created_by.username}}</td>
+                            <td>
+                                    <div
+                                        class="bg-white shadow roundy px-2 py-2 d-flex align-items-center justify-content-between mb-0">
+                                        <div class="flex-grow-1 d-flex align-items-center">
+                                            {% if purchaseorder.status.id == 1 %}
+                                            <div class="dot mr-3 bg-violet"></div>
+                                            {% elif purchaseorder.status.id == 2 %}
+                                            <div class="dot mr-3 bg-green"></div>
+                                            {% else %}
+                                            <div class="dot mr-3 bg-red"></div>
+                                            {% endif %}
+                                            <div class="text">
+                                                <h6 class="mb-0">{{purchaseorder.foruser}}&nbsp;{{purchaseorder.status.name}}</h6>
+                                            </div>
+                                        </div>
+    
+                                    </div>
+                                </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'base.htm' %}
+
+{% block content %}
+
+<section class="py-3">
+
+</section>
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h6 text-uppercase mb-0">Create Purchase Order</h3>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal edit-purchaseorder-form" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="">
+                    <input type="hidden" name="budgetid" value="">
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">PO Number</label>
+                        <div class="col-md-4">
+                            <input type="text" name="ponumber" value="PO121" class="form-control" disabled required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="title" value="" placeholder="PO title" class="form-control" 
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">PR Reference</label>
+                        <div class="col-md-9 select mb-3">
+                            <select id="PRNumber" name="prnumber" class="form-control" required disabled>
+                                <option value="">Select PR Number</option>
+                                {% for pr in purchaserequisitions %}
+                                <option value="{{pr.id}}" {% if pr.id == purchaserequisition.id %}
+                                selected {% endif %}>{{pr.title}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Due Date</label>
+                        <div class="col-md-4">
+                            <input type="date" name="duedate" value="" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Purchase Requisition Id</label>
+                        <div class="col-md-4">
+                            <input type="text" name="prid" value="{{purchaserequisition.id}}" class="form-control" disabled required>
+                        </div>
+                        <!-- <div class="col-md-4">
+                            <input type="text" name="prname" value="{{purchaserequisition.title}}" class="form-control" disabled required>
+                        </div> -->
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Vendor</label>
+                        <div class="col-md-4">
+                            <input type="text" placeholder="vendor name" name="prvendorname" value="{{purchaserequisition.vendor_name}}"
+                                class="form-control" disabled required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" placeholder="vendor account" name="prvendoraccount" value="{{purchaserequisition.vendor_account}}"
+                                class="form-control" disabled required>
+                        </div>
+                    </div>
+
+                    <div class="line"></div>
+
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col-md-12">
+                            <h5 class="col-md-9 float-left">PR Line Items</h4>
+                                <button id="add_row_po_line" data-last-indx="0" type="button"
+                                    class="btn btn-primary float-right"><i class="fa fa-plus" aria-hidden="true"></i>
+                                    Add PR Line Item</button>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-hover" id="tab_logic">
+                                <thead>
+                                    <tr>
+                                        <!-- <th class="text-center"> # </th> -->
+                                        <!-- <th class="text-center"> No </th> -->
+                                        <th class="text-center"> PR Line Item </th>
+                                        <th class="text-center"> Qty </th>
+                                        <th class="text-center"> Unit Price </th>
+                                        <th class="text-center"> Amount </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tab_logic">
+                                    {% if line_items|length == 0 %}
+                                    <tr id='addrpoline0' data-indx="0" class="po-pr-line-item">
+                                        <!-- <td>{{forloop.counter}}</td> -->
+                                        <input type="hidden" name="lineid" value="{{item.id}}">
+                                        <!-- <td><input type="number" name='linenumber' value="{{item.line_amount}}"
+                                                placeholder='Number' class="form-control amount" step="0.00" min="0"
+                                                required />
+                                        </td> -->
+                                        <td> <select id="PRLineItems1" data-indx="1" name="prlineitems" class="form-control po-pr-line-items" required>
+                                                <option value="">Select PR Item</option>
+                                                {% for lineItem in lineItems %}
+                                                <option value="{{lineItem.id}}">PRL{{lineItem.id}}-{{lineItem.description}}</option>
+                                                {% endfor %}
+                                            </select></td>
+                                        <td><input id="linequantity1" data-indx="1" type="number" name='linequantity' value="{{item.line_amount}}"
+                                                placeholder='quantity' class="form-control quantity" step="0.00" min="0"
+                                                required disabled/>
+                                        </td>
+                                        <td><input id="lineprice1" data-indx="1" type="number" name='lineunitprice' value="{{item.line_amount}}"
+                                                placeholder='unit price' class="form-control price" step="0.00" min="0"
+                                                required disabled/>
+                                        </td>
+                                        <td><input id="lineamount1" data-indx="1" type="number" name='lineamount' value="{{item.line_amount}}"
+                                                placeholder='amount' class="form-control amount" step="0.00" min="0"
+                                                required disabled/>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% for item in line_items %}
+                                    <tr id='addr{{forloop.counter}}' data-indx="{{forloop.counter}}" class="po-pr-line-item">
+                                        <!-- <td>{{forloop.counter}}</td> -->
+                                        <input type="hidden" name="lineid" value="{{item.id}}">
+                                        <!-- <td><input type="number" name='linenumber' value="{{item.line_amount}}"
+                                                placeholder='unit price' class="form-control amount" step="0.00" min="0"
+                                                required /> 
+                                        </td> -->
+                                        <td><input type="text" name='linedescription' placeholder='Description'
+                                                class="form-control desc" value="{{item.description}}" required /></td>
+                                        <td><input type="number" name='linequantity' value="{{item.line_amount}}"
+                                                placeholder='quantity' class="form-control quantity" step="0.00" min="0"
+                                                required />
+                                        </td>
+                                        <td><input type="number" name='lineunitprice' value="{{item.line_amount}}"
+                                                placeholder='unit price' class="form-control price" step="0.00" min="0"
+                                                required />
+                                        </td>
+                                        <td><input type="number" name='lineamount' value="{{item.line_amount}}"
+                                                placeholder='amount' class="form-control amount" step="0.00" min="0"
+                                                required />
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr id='addrpoline{{line_items | length | add:1}}' data-indx="{{line_items | length | add:1}}" class="po-pr-line-item"></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- <div class="row clearfix">
+                        <div class="col-md-12">
+                            <button id="add_row" type="button" class="btn btn-default pull-left">Add Row</button>
+                            <button id='delete_row' type="button" class="pull-right btn btn-default">Delete Row</button>
+                        </div>
+                    </div> -->
+                    <div class="form-group row">
+                        <div class="col-md-9 ml-auto">
+                            <button type="button" onclick="location.href = '/purchaseorder/list'"
+                                class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

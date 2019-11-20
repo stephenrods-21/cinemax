@@ -19,6 +19,7 @@ from . import views
 
 urlpatterns = [
     path('', include('cinemaxpr.urls')),
+    path('', include('cinemaxpo.urls')),
     path('login', views.login, name='login'),
     path('logout', views.logoutUser, name='logout'),
     path('admindashboard', views.adminDashboard, name='admindashboard'),

@@ -152,6 +152,32 @@ class PurchaseRequisitionLineDetail(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
+class AttachmentDetail(models.Model):
+    memo = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
+    # image = models.ImageField(upload_to="images")
+    attachment = models.FileField(upload_to="attachments")
+    file_name = models.CharField(max_length=200, null=True)
+    content_type = models.CharField(max_length=100, null=True)
+    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
+
+class PurchaseOrderDetail(models.Model):
+    title = models.CharField(max_length=100, null=False)
+    due_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    purchaseRequisitionDetail = models.ForeignKey(PurchaseRequisitionDetail, blank=True, null=True, on_delete=models.CASCADE)
+    status = models.ForeignKey(ApprovalStatus, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
+
+class PurchaseOrderLineDetail(models.Model):
+    quantity = models.IntegerField(null=False, default=1)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    purchaseRequisitionLineDetail = models.ForeignKey(PurchaseRequisitionLineDetail, blank=True, null=True, on_delete=models.CASCADE)
+    purchaseOrderDetail = models.ForeignKey(PurchaseOrderDetail, blank=True, null=True, on_delete=models.CASCADE)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
+
 class TransactionDetail(models.Model):
     level = models.IntegerField(null=False, default=1)
     extendeduserObj = models.IntegerField(null=False, default=1)
@@ -162,18 +188,9 @@ class TransactionDetail(models.Model):
     memoObj = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
     purchaseRequisitionDetail = models.ForeignKey(PurchaseRequisitionDetail, blank=True, null=True, on_delete=models.CASCADE)
     purchaseRequisitionLineDetail = models.ForeignKey(PurchaseRequisitionLineDetail, blank=True, null=True, on_delete=models.CASCADE)
+    purchaseOrderDetail = models.ForeignKey(PurchaseOrderDetail, blank=True, null=True, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     created_on = models.DateTimeField(null=True)
     modified_on = models.DateTimeField(null=True)
     deleted_on = models.DateTimeField(null=True)
     entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
-
-class AttachmentDetail(models.Model):
-    memo = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
-    # image = models.ImageField(upload_to="images")
-    attachment = models.FileField(upload_to="attachments")
-    file_name = models.CharField(max_length=200, null=True)
-    content_type = models.CharField(max_length=100, null=True)
-    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
-

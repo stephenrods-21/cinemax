@@ -59,10 +59,10 @@
     <div id="sidebar" class="sidebar py-3">
       <div class="text-gray-400 text-uppercase px-3 px-lg-4 py-4 font-weight-bold small headings-font-family">MAIN</div>
       <ul class="sidebar-menu list-unstyled">
+        {% if request.session.role == "Requester" and request.session.entity_type_id == 1 %}
         <li class="sidebar-list-item"><a href="{% url 'dashboard' %}"
             class="sidebar-link text-muted {% if view == 'dashboard' %} active {% endif %}"><i
               class="o-home-1 mr-3 text-gray"></i><span>Dashboard</span></a></li>
-        {% if request.session.role == "Requester" %}
         <li class="sidebar-list-item"><a href="{% url 'memo' %}"
             class="sidebar-link text-muted {% if view == 'memo' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Memo</span></a></li>
@@ -72,6 +72,14 @@
         <li class="sidebar-list-item"><a href="{% url 'purchaserequisition' %}"
             class="sidebar-link text-muted {% if view == 'purchaserequisition' %} active {% endif %}"><i
               class="o-sales-up-1 mr-3 text-gray"></i><span>Purchase Requisition</span></a></li>
+        {% endif %}
+        {% if request.session.role == "Requester" and request.session.entity_type_id == 2 %}
+        <li class="sidebar-list-item"><a href="{% url 'purchaseorderdashboard' %}"
+            class="sidebar-link text-muted {% if view == 'purchaseorderdash' %} active {% endif %}"><i
+              class="o-home-1 mr-3 text-gray"></i><span>Dashboard</span></a></li>
+        <li class="sidebar-list-item"><a href="{% url 'purchaseorderlist' %}"
+            class="sidebar-link text-muted {% if view == 'purchaseorder' %} active {% endif %}"><i
+              class="o-sales-up-1 mr-3 text-gray"></i><span>Purchase Order</span></a></li>
         {% endif %}
       </ul>
     </div>
@@ -110,6 +118,7 @@
   <script src="{% static 'site/js/memo.js' %}"></script>
   <script src="{% static 'site/js/purchaserequisition.js' %}"></script>
   <script src="{% static 'site/js/dashboard.js' %}"></script>
+  <script src="{% static 'site/js/purchaseorder.js' %}"></script>
 </body>
 
 </html>

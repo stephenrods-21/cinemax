@@ -29,12 +29,14 @@ def login(request):
             extended_user = ExtendedUser.objects.get(user_id=request.user.id)
 
             request.session['role'] = extended_user.role.name
+            # request.session['entity_type_id'] = 2
             request.session['entity_type_id'] = extended_user.entity_type_id
             request.session['bu_id'] = extended_user.businessunit_id
-            # request.session['entity_type_id'] = 2
 
             if user.is_superuser:
                 return redirect('admindashboard')
+            elif extended_user.entity_type_id == 2:
+                return redirect('purchaseorder/dashboard')
             else:
                 return redirect('dashboard')
         else:
@@ -54,7 +56,7 @@ def editUser(request, id):
         user = User.objects.create_user(
             username=userData['username'], password=userData['password'])
         extendedUser = ExtendedUser(
-            email=userData['email'], role_id=userData['role'], businessunit_id=userData['businessunit'], user_id=user.id)
+            email=userData['email'], role_id=userData['role'], businessunit_id=userData['businessunit'], user_id=user.id, entity_type_id=request.session['entity_type_id'])
         extendedUser.save()
 
         return HttpResponse(json.dumps({'success': 'true'}), content_type="application/json")
@@ -96,7 +98,8 @@ def adminDashboard(request):
 
 @user_passes_test(check_access)
 def manageUsers(request):
-    users = ExtendedUser.objects.filter(entity_type_id=request.session['entity_type_id']).select_related()
+    users = ExtendedUser.objects.filter(
+        entity_type_id=request.session['entity_type_id']).select_related()
     return render(request, 'admin/manageusers.htm', {'view': 'manageusers', 'title': 'Manage Users', 'users': users, 'businessunits': businessunit.objects.filter(entity_type_id=request.session['entity_type_id']), 'roles': Role.objects.filter(entity_type_id=request.session['entity_type_id'])})
 
 
@@ -120,7 +123,8 @@ def roles(request):
 
 @user_passes_test(check_access)
 def addRole(request):
-    role = Role(name=request.POST['name'], created_by_id=request.user.id, entity_type_id=request.session['entity_type_id'])
+    role = Role(name=request.POST['name'], created_by_id=request.user.id,
+                entity_type_id=request.session['entity_type_id'])
     role.save()
     return redirect('roles')
 
@@ -147,7 +151,7 @@ def editlineOfApproval(request, id):
         loaApprovalRuleList = json.loads(request.POST['approvalRuleList'])
 
         lineOfApproval = LineOfApproval(name=loaData['name'], businessunit=businessunit.objects.get(id=loaData['businessunit']),
-                                        no_of_approver=0, created_by=request.user)
+                                        no_of_approver=0, created_by=request.user, entity_type_id=request.session['entity_type_id'])
         lineOfApproval.save()
 
         for approver in loaApproverList:
@@ -156,7 +160,8 @@ def editlineOfApproval(request, id):
                                                             id=approver['approver_id']),
                                                         required_approval=loaApprovalRuleList[int(
                                                             approver["level"])-1]['required_approval'],
-                                                        level=approver['level'])
+                                                        level=approver['level'],
+                                                        entity_type_id=request.session['entity_type_id'])
 
             lineOfApprovalDetail.save()
 

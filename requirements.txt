@@ -3,6 +3,7 @@ autopep8==1.4.4
 colorama==0.4.1
 Django==2.2.7
 gunicorn==19.9.0
+html5lib==1.0.1
 isort==4.3.21
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
@@ -11,8 +12,12 @@ pycodestyle==2.5.0
 pylint==2.4.3
 pylint-django==2.0.12
 pylint-plugin-utils==0.6
+PyPDF2==1.26.0
 pytz==2019.3
+reportlab==3.5.32
 six==1.13.0
 sqlparse==0.3.0
+webencodings==0.5.1
 whitenoise==4.1.4
 wrapt==1.11.2
+xhtml2pdf==0.2.3

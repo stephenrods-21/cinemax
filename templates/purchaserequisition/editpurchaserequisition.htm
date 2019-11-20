@@ -85,7 +85,7 @@
                                 </thead>
                                 <tbody id="tab_logic">
                                         {% if line_items|length == 0 %}
-                                        <tr id='addr{{forloop.counter}}' class="pr-line-item">
+                                        <tr id='addr0' class="pr-line-item">
                                                 <!-- <td>{{forloop.counter}}</td> -->
                                                 <input type="hidden" name="lineid" value="">
                                                 <td><input type="text" name='linedescription' placeholder='Description'
@@ -97,7 +97,6 @@
                                                 <td><input type="text" name='lineremark' value="{{item.remark}}" placeholder=''
                                                         class="form-control remark" /></td>
                                             </tr>
-                                    </tr>
                                     {% endif %}
                                     {% for item in line_items %}
                                     <tr id='addr{{forloop.counter}}' class="pr-line-item">
