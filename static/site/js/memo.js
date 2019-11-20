@@ -1,5 +1,38 @@
 $(document).ready(() => {
 
+    // $(document).on('click', '#upload', function(e) {
+    //     console.log("UPLOAD")
+    //     $('#zmr').click();
+    // });
+
+
+    // $(document).on('submit', '#id_ajax_upload_form', function (e) {
+    //     e.preventDefault();
+    //     $form = $(this)
+    //     var formData = new FormData(this);
+    //     $.ajax({
+    //         url: '/upload',
+    //         type: 'POST',
+    //         data: formData,
+    //         success: function (response) {
+    //             $('.error').remove();
+    //             console.log(response)
+    //             if (response.error) {
+    //                 $.each(response.errors, function (name, error) {
+    //                     error = '<small class="text-muted error">' + error + '</small>'
+    //                     $form.find('[name=' + name + ']').after(error);
+    //                 })
+    //             } else {
+    //                 alert(response.message)
+    //                 //window.location = ""
+    //             }
+    //         },
+    //         cache: false,
+    //         contentType: false,
+    //         processData: false
+    //     });
+    // });
+
     $(document).on('change', '#MemoBU', (e) => {
         if ($('#MemoBU').val() != '') {
             $.ajax({
@@ -15,21 +48,28 @@ $(document).ready(() => {
         }
     })
 
-    $(document).on('submit', '.edit-memo-form', function (e) {
+    $(document).on('submit', '#id_ajax_upload_form', function (e) {
         $(this).attr('disabled', true);
         e.preventDefault();
+        console.log("sfdsfsdfdsf")
+
+        // var form = $(".edit-memo-form");
+        // var model = {
+        //     id: $("[name='id']", form).val() == '' ? 0 : $("[name='id']", form).val(),
+        //     businessunit: $("[name='businessunit']", form).val(),
+        //     documentno: $("[name='documentno']", form).val(),
+        //     topic: $("[name='topic']", form).val(),
+        //     description: $("[name='description']", form).val(),
+        //     amount: $("[name='amount']", form).val()
+        // };
 
         var form = $(".edit-memo-form");
-        var model = {
-            id: $("[name='id']", form).val() == '' ? 0 : $("[name='id']", form).val(),
-            businessunit: $("[name='businessunit']", form).val(),
-            documentno: $("[name='documentno']", form).val(),
-            topic: $("[name='topic']", form).val(),
-            description: $("[name='description']", form).val(),
-            amount: $("[name='amount']", form).val()
-        };
-
-        var postUrl = $("[name='id']", form).val() == '' ? '/editmemo/' + model.id : '/updatememo';
+        var id = $("[name='id']", form).val() == '' ? 0 : $("[name='id']", form).val()
+        var formData = new FormData(this);
+        formData.append('documentno', $("[name='documentno']", form).val())
+        formData.append('amount', $("[name='amount']", form).val())
+        
+        var postUrl = $("[name='id']", form).val() == '' ? '/editmemo/' + id : '/updatememo';
 
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },
@@ -38,14 +78,16 @@ $(document).ready(() => {
                 $('.ajax-loader').css("visibility", "visible");
             },
             url: postUrl,
-            data: { data: JSON.stringify(model) },
-            context: this,
+            data: formData,
             success: function (data) {
                 window.location.href = '/memo';
             },
             complete: function () {
                 $('.ajax-loader').css("visibility", "hidden");
-            }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
         });
         return false;
     });

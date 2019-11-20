@@ -3,18 +3,21 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Q
-from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
+from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, AttachmentDetail, PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
 import json
+import os
+from django.http import JsonResponse
+from .forms import ImageFileUploadForm
 from cinemax.enums import Status
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.conf import settings
+from django.http import HttpResponse, Http404
 
 # Create your views here.
 @login_required(login_url='login')
 def index(request):
     return render(request, 'index.htm')
-
 
 @login_required(login_url='login')
 def dashboard(request):
@@ -38,36 +41,52 @@ def dashboard(request):
 
 @login_required(login_url='login')
 def memo(request):
-    return render(request, 'memo/list.htm', {'view': 'memo', 'title': 'Memo', 'memos': MemoDetail.objects.filter(created_by_id=request.user.id).select_related()})
-
+    memos = MemoDetail.objects.filter(created_by_id=request.user.id).select_related()
+    return render(request, 'memo/list.htm', {'view': 'memo', 'title': 'Memo', 'memos': memos})
 
 @login_required(login_url='login')
 def editMemo(request, id):
+    document_id = 0
     if id > 0:
         editMemo = MemoDetail.objects.get(id=id)
         return render(request, 'memo/editmemo.htm', {'view': 'memo', 'title': 'Edit Memo', 'editMemo': editMemo, 'businessunits': businessunit.objects.filter(Q(is_visible=False) | Q(id=request.session['bu_id']))})
 
     if request.method == "POST":
-        memoData = json.loads(request.POST['data'])
+        businessunit_id = int(request.POST['businessunit'])
+        topic = request.POST['topic']
+        description = request.POST['description']
+        amount = request.POST['amount']
+        document_no = request.POST['documentno']
 
-        memo = MemoDetail(documentno=memoData['documentno'], topic=memoData['topic'], businessunit=businessunit.objects.get(id=memoData['businessunit']),
+        for filename, file in request.FILES.items():
+            form = ImageFileUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                result = form.save()
+                document_id = result.pk
+
+        memo = MemoDetail(documentno=document_no, topic=topic, businessunit=businessunit.objects.get(id=businessunit_id),
                           approvalstatus_id=Status.PENDING.value, created_by=request.user)
         budget = BudgetDetail(
-            description=memoData['description'], amount=memoData['amount'], created_by_id=request.user.id)
+            description=description, amount=amount, created_by_id=request.user.id)
         budget.save()
         memo.budget_id = budget.id
         memo.save()
+        #Add memo to attachment reference if exists 
+        if document_id > 0:
+            attachment = AttachmentDetail.objects.get(id=document_id)
+            attachment.memo_id = memo.id
+            attachment.save()
 
         # update the new document number
         editBusinessUnit = businessunit.objects.get(
-            id=memoData['businessunit'])
+            id=businessunit_id)
         editBusinessUnit.documentno = editBusinessUnit.documentno + 1
         editBusinessUnit.save()
 
-        # get LOA for based on Business Unit
+        # get LOA for based on Users Business Unit
         if(LineOfApproval.objects.filter(businessunit_id=memo.businessunit_id).count() > 0):
             lineOfApproval = LineOfApproval.objects.get(
-                businessunit_id=memo.businessunit_id)
+                businessunit_id=request.session['bu_id'])
             lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
                 line_of_approval_id=lineOfApproval.id, level=1)
 
@@ -90,15 +109,17 @@ def editMemo(request, id):
 @login_required(login_url='login')
 def updateMemo(request):
     if request.method == "POST":
-        memoData = json.loads(request.POST['data'])
+        print(request.POST)
+        memo_id = int(request.POST['id'])
+        topic = request.POST['topic']
+        description = request.POST['description']
+        amount = request.POST['amount']
 
-        editMemo = MemoDetail.objects.get(id=memoData['id'])
+        editMemo = MemoDetail.objects.get(id=memo_id)
         editBudget = BudgetDetail.objects.get(id=editMemo.budget_id)
-        editBudget.description = memoData['description']
+        editBudget.description = description
         editBudget.save()
-        editMemo.topic = memoData['topic']
-        editMemo.businessunit_id = memoData['businessunit']
-        editMemo.documentno = memoData['documentno']
+        editMemo.topic = topic
         editMemo.save()
 
     return redirect('memo')

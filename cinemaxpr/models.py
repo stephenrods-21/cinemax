@@ -168,3 +168,12 @@ class TransactionDetail(models.Model):
     deleted_on = models.DateTimeField(null=True)
     entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
 
+class AttachmentDetail(models.Model):
+    memo = models.ForeignKey(MemoDetail, blank=True, null=True, on_delete=models.CASCADE)
+    # image = models.ImageField(upload_to="images")
+    attachment = models.FileField(upload_to="attachments")
+    file_name = models.CharField(max_length=200, null=True)
+    content_type = models.CharField(max_length=100, null=True)
+    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    entity_type = models.ForeignKey(EntityType, default=1, on_delete=models.CASCADE)
+

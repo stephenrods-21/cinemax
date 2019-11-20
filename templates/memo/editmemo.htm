@@ -13,7 +13,7 @@
                 <h3 class="h6 text-uppercase mb-0">Add Memo</h3>
             </div>
             <div class="card-body">
-                <form class="form-horizontal edit-memo-form" method="POST">
+                <form class="form-horizontal edit-memo-form" enctype="multipart/form-data" id="id_ajax_upload_form" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="id" value="{{editMemo.id}}">
                     <div class="form-group row">
@@ -56,11 +56,25 @@
                                 required>{{editMemo.budget.description}}</textarea>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 form-control-label">Attach File</label>
+                        <div class="col-md-9">
+                            <input type="file" name="attachment" class="form-control">
+                        </div>
+                        <!-- {{ form.as_p }} -->
+                    </div>
+                    <!-- <div class="form-group row">
+                            <label class="col-md-3 form-control-label">Attach File</label>
+                            <div class="col-md-9">
+                                <input type="file" name="attachment" class="form-control"
+                                    required>
+                            </div>
+                        </div> -->
                     <div class="row form-group">
                         <label class="col-md-3 form-control-label">Estimated Budget</label>
                         <div class="col-md-9 input-group">
-                            <input type="text" name="amount" value="{{editMemo.budget.amount}}" 
-                                class="form-control"  {% if editMemo.budget_id > 0  %} disabled {% endif %}>
+                            <input type="text" name="amount" value="{{editMemo.budget.amount}}" class="form-control"
+                                {% if editMemo.budget_id > 0  %} disabled {% endif %}>
                             <div class="input-group-append"><span class="input-group-text">THB</span></div>
                         </div>
                     </div>
@@ -69,10 +83,20 @@
                         <div class="col-md-9 ml-auto">
                             <button type="button" onclick="location.href = '/memo'"
                                 class="btn btn-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">{% if editMemo.id > 0 %} Save changes {% else %} Submit for approval {% endif %}</button>
+                            <button type="submit" class="btn btn-primary">{% if editMemo.id > 0 %} Save changes
+                                {% else %} Submit for approval {% endif %}</button>
                         </div>
                     </div>
                 </form>
+                <!--Attachment Uploader test form-->
+
+
+
+
+
+
+
+
             </div>
         </div>
     </div>
