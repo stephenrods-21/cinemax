@@ -22,7 +22,7 @@
                         <div class="left d-flex align-items-center">
                             <!-- <div class="icon icon-lg shadow mr-3 text-gray"><i class="fab fa-dropbox"></i></div> -->
                             <div class="text">
-                                <h6 class="mb-0 d-flex align-items-center"> <span>{{purchaseorder.title}}.</span>
+                                <h6 class="mb-0 d-flex align-items-center"> <span><a href="/purchaseorder/editpurchaseorder/{{purchaseorder.purchasereq.id}}/{{purchaseorder.poid}}">{{purchaseorder.title}}</a></span>
                                     <!-- <span class="dot dot-sm ml-2 bg-violet"></span> -->
                                 </h6><small class="text-gray">{{purchaseorder.purchasereq.actual_amount}} THB</small>
                             </div>
@@ -78,7 +78,7 @@
                         </div>
                         <div class="right ml-5 ml-sm-0 pl-3 pl-sm-0 text-violet">
                             <button type="button"
-                                onclick="location.href = '/purchaseorder/editpurchaseorder/{{item.id}}'"
+                                onclick="location.href = '/purchaseorder/editpurchaseorder/{{item.id}}/0'"
                                 class="btn btn-primary float-right"><i class="fa fa-plus" aria-hidden="true"></i>
                                 Create PO</button>
                             <!-- <button type="button" class="btn btn-success float-right approve-request"

@@ -57,16 +57,27 @@ def purchaseorder(request):
     return render(request, 'purchaseorder/list.htm', {'view': 'purchaseorder', 'title': 'Purchase Order', 'purchaseorders': purchase_order_vm_list})
 
 
-def editpurchaseorder(request, id):
+def editpurchaseorder(request, id, poid):
     # Fetch all PR
     purchaserequisitions = PurchaseRequisitionDetail.objects.all()
+
+    if poid > 0 and id > 0:
+        purchaseorder = PurchaseOrderDetail.objects.get(id=poid)
+        purchaseorderitems = PurchaseOrderLineDetail.objects.filter(purchaseOrderDetail_id=poid)
+        # Get PR reference
+        purchaserequisition = PurchaseRequisitionDetail.objects.get(id=id)
+        # Get PR Line Items
+        lineItems = PurchaseRequisitionLineDetail.objects.filter(
+            purchaseRequisitionDetail_id=id)
+        return render(request, 'purchaseorder/editpurchaseorder.htm', {'view': 'purchaseorder', 'title': 'Purchase Order','purchaserequisition': purchaserequisition, 'purchaserequisitions': purchaserequisitions, 'lineItems': lineItems, 'purchaseorder': purchaseorder, 'purchaseorderitems': purchaseorderitems})
+
     if id > 0:
         # Get PR reference
         purchaserequisition = PurchaseRequisitionDetail.objects.get(id=id)
         # Get PR Line Items
         lineItems = PurchaseRequisitionLineDetail.objects.filter(
             purchaseRequisitionDetail_id=id)
-        return render(request, 'purchaseorder/editpurchaseorder.htm', {'purchaserequisition': purchaserequisition, 'purchaserequisitions': purchaserequisitions, 'lineItems': lineItems})
+        return render(request, 'purchaseorder/editpurchaseorder.htm', {'view': 'purchaseorder', 'title': 'Purchase Order','purchaserequisition': purchaserequisition, 'purchaserequisitions': purchaserequisitions, 'lineItems': lineItems})
 
     if request.method == "POST":
         purchaseorder_line_data = json.loads(request.POST['lineitems'])

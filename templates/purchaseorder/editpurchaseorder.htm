@@ -22,7 +22,7 @@
                             <input type="text" name="ponumber" value="PO121" class="form-control" disabled required>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" name="title" value="" placeholder="PO title" class="form-control" 
+                            <input type="text" name="title" value="{{purchaseorder.title}}" placeholder="PO title" class="form-control" 
                                 required>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                     <div class="row" style="margin-bottom: 10px;">
                         <div class="col-md-12">
                             <h5 class="col-md-9 float-left">PR Line Items</h4>
-                                <button id="add_row_po_line" data-last-indx="0" type="button"
+                                <button id="add_row_po_line" data-last-indx="0" type="button" {% if purchaseorder.id > 0  %} disabled {% endif %}
                                     class="btn btn-primary float-right"><i class="fa fa-plus" aria-hidden="true"></i>
                                     Add PR Line Item</button>
                         </div>
@@ -90,7 +90,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tab_logic">
-                                    {% if line_items|length == 0 %}
+                                    {% if purchaseorderitems|length == 0 %}
                                     <tr id='addrpoline0' data-indx="0" class="po-pr-line-item">
                                         <!-- <td>{{forloop.counter}}</td> -->
                                         <input type="hidden" name="lineid" value="{{item.id}}">
@@ -98,7 +98,7 @@
                                                 placeholder='Number' class="form-control amount" step="0.00" min="0"
                                                 required />
                                         </td> -->
-                                        <td> <select id="PRLineItems1" data-indx="1" name="prlineitems" class="form-control po-pr-line-items" required>
+                                        <td> <select data-indx="1" name="prlineitems" class="form-control po-pr-line-items" required>
                                                 <option value="">Select PR Item</option>
                                                 {% for lineItem in lineItems %}
                                                 <option value="{{lineItem.id}}">PRL{{lineItem.id}}-{{lineItem.description}}</option>
@@ -118,27 +118,27 @@
                                         </td>
                                     </tr>
                                     {% endif %}
-                                    {% for item in line_items %}
+                                    {% for item in purchaseorderitems %}
                                     <tr id='addr{{forloop.counter}}' data-indx="{{forloop.counter}}" class="po-pr-line-item">
                                         <!-- <td>{{forloop.counter}}</td> -->
                                         <input type="hidden" name="lineid" value="{{item.id}}">
-                                        <!-- <td><input type="number" name='linenumber' value="{{item.line_amount}}"
-                                                placeholder='unit price' class="form-control amount" step="0.00" min="0"
-                                                required /> 
-                                        </td> -->
-                                        <td><input type="text" name='linedescription' placeholder='Description'
-                                                class="form-control desc" value="{{item.description}}" required /></td>
-                                        <td><input type="number" name='linequantity' value="{{item.line_amount}}"
+                                        <td> <select data-indx="1" name="prlineitems" class="form-control po-pr-line-items" required>
+                                                <option value="">Select PR Item</option>
+                                                {% for lineItem in lineItems %}
+                                                <option value="{{lineItem.id}}">PRL{{lineItem.id}}-{{lineItem.description}}</option>
+                                                {% endfor %}
+                                            </select></td>
+                                        <td><input id="linequantity1" data-indx="1" type="number" name='linequantity' value="{{item.quantity}}"
                                                 placeholder='quantity' class="form-control quantity" step="0.00" min="0"
-                                                required />
+                                                required disabled/>
                                         </td>
-                                        <td><input type="number" name='lineunitprice' value="{{item.line_amount}}"
+                                        <td><input id="lineprice1" data-indx="1" type="number" name='lineunitprice' value="{{item.unit_price}}"
                                                 placeholder='unit price' class="form-control price" step="0.00" min="0"
-                                                required />
+                                                required disabled/>
                                         </td>
-                                        <td><input type="number" name='lineamount' value="{{item.line_amount}}"
+                                        <td><input id="lineamount1" data-indx="1" type="number" name='lineamount' value="{{item.amount}}"
                                                 placeholder='amount' class="form-control amount" step="0.00" min="0"
-                                                required />
+                                                required disabled/>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -157,7 +157,7 @@
                         <div class="col-md-9 ml-auto">
                             <button type="button" onclick="location.href = '/purchaseorder/list'"
                                 class="btn btn-secondary">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary" {% if purchaseorder.id > 0  %} disabled {% endif %}>Submit</button>
                         </div>
                     </div>
                 </form>

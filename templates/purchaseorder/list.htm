@@ -28,8 +28,9 @@
                     <tbody>
                         {% for purchaseorder in purchaseorders %}
                         <tr>
+                                
                             <td>PO{{purchaseorder.poid}}</td>
-                            <td>{{purchaseorder.title}}</td>
+                            <td><a href="/purchaseorder/editpurchaseorder/{{purchaseorder.purchasereq.id}}/{{purchaseorder.poid}}">{{purchaseorder.title}}</a></td>
                             <td>{{purchaseorder.created_by.username}}</td>
                             <td>
                                     <div
