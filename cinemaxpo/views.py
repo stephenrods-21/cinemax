@@ -6,11 +6,13 @@ from .viewmodels import purchase_order_vm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse
-
+from .render import Render
 from xhtml2pdf import pisa
 from io import StringIO
+import os
 from django.template.loader import get_template
 from django.template import Context
+import pdfkit
 
 # Create your views here.
 
@@ -223,14 +225,31 @@ def getprlinedetailbyid(request, id):
     lineitem = PurchaseRequisitionLineDetail.objects.get(id=id)
     return HttpResponse(json.dumps({'id': lineitem.id, 'amount': str(lineitem.line_amount)}), content_type="application/json")
 
-# def generate_pdf(request):
-#     template = get_template(settings.STATIC_ROOT+'\\invoice.htm')
-#     html=template.render({})
-#     result=StringIO()
-#     pdf=pisa.pisaDocument(StringIO(html), dest=result)
-#     if not pdf.err:
-#         return HttpResponse(result.getvalue(), content_type='application/pdf')
-#     else: return HttpResponse('Errors')
+def generate_pdf(request, poid):
+    purchase_order = PurchaseOrderDetail.objects.get(id=poid)
+    purchase_order_items = PurchaseOrderLineDetail.objects.filter(purchaseOrderDetail_id=poid)
+    #calculate total
+    grand_total = 0
+    for item in purchase_order_items:
+        grand_total = grand_total + item.amount
+
+    template = get_template("pdf/invoice.htm")
+    model = {
+        'purchase_order': purchase_order,
+        'purchase_order_items': purchase_order_items,
+        'grand_total': grand_total
+    }
+    html = template.render(model)
+    pdf = pdfkit.from_string(html, False)
+    # pdf = open("out.pdf", encoding="utf8")
+    # response = HttpResponse(pdf.read(), content_type='application/pdf')
+    # response['Content-Disposition'] = 'attachment; filename=output.pdf'
+    # pdf.close()
+    # os.remove("out.pdf")
+    response = HttpResponse(pdf, content_type='application/pdf')
+    return response
+
+    # return Render.render('pdf/invoice.htm', {})
 
 # def render_to_pdf(template_src, context_dict={}):
 #     template = get_template(template_src)

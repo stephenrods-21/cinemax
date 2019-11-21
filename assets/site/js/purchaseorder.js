@@ -34,8 +34,6 @@ $(document).ready(() => {
                 url: '/purchaseorder/getprdetail/' + $('#PRNumber').val(),
                 context: this,
                 success: function (data) {
-                    console.log(data)
-                    //$('#DocumentNumber').val(data.documentno);
                 }
             });
         }
@@ -62,7 +60,7 @@ $(document).ready(() => {
         lineItems.pop();
         formData.append('lineitems', JSON.stringify(lineItems))
 
-        var postUrl = $("[name='id']", form).val() == '' ? '/purchaseorder/editpurchaseorder/' + id : '/purchaseorder/updatepurchaseorder';
+        var postUrl = $("[name='id']", form).val() == '' ? '/purchaseorder/editpurchaseorder/' + id + '/0' : '/purchaseorder/updatepurchaseorder';
 
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },
@@ -73,10 +71,10 @@ $(document).ready(() => {
             url: postUrl,
             data: formData,
             success: function (data) {
-                 window.location.reload()
             },
             complete: function () {
                 $('.ajax-loader').css("visibility", "hidden");
+                window.location.href = '/purchaseorder/list'
             },
             cache: false,
             contentType: false,
@@ -91,10 +89,6 @@ $(document).ready(() => {
 
         var trid = $(this).closest('tr').attr('data-indx');
         var amount = $(this).closest('tr').find('.amount').val();
-        console.log(trid)
-        //$(this).closest('tr').find('.amount').val(909090);
-        console.log(amount)
-
 
         if (prLineId != '') {
             $.ajax({
@@ -107,9 +101,6 @@ $(document).ready(() => {
                     $(this).closest('tr').find('.amount').val(data.amount);
                     $(this).closest('tr').find('.quantity').val(1);
                     $(this).closest('tr').find('.price').val(data.amount);
-                    // $('#linequantity' + indx).val(1);
-                    // $('#lineprice' + indx).val(data.amount);
-                    // $('#lineamount' + indx).val(data.amount);
                 }
             });
         }
@@ -129,10 +120,11 @@ $(document).ready(() => {
             url: '/purchaseorder/updatePOTransactionStatus/' + transactionId + '/1',
             context: this,
             success: function (data) {
-                window.location.reload();
+
             },
             complete: function () {
                 $('.ajax-loader').css("visibility", "hidden");
+                window.location.reload();
             }
         });
     });
@@ -151,10 +143,11 @@ $(document).ready(() => {
             url: '/purchaseorder/updatePOTransactionStatus/' + transactionId + '/0',
             context: this,
             success: function (data) {
-                window.location.reload();
+
             },
             complete: function () {
                 $('.ajax-loader').css("visibility", "hidden");
+                window.location.reload();
             }
         });
     });

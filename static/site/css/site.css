@@ -12,3 +12,13 @@
     top:50%;
     left:50%;
   }
+
+  .xls {
+    font-weight: 400 !important;
+    border: 1px solid transparent !important;
+    padding: 0.2rem 0.2rem !important;
+    font-size: 0.6rem !important;
+    line-height: 0.7 !important;
+    border-radius: 2rem !important;
+    background-color: darkseagreen !important;
+  }

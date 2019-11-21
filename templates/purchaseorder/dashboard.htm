@@ -22,9 +22,15 @@
                         <div class="left d-flex align-items-center">
                             <!-- <div class="icon icon-lg shadow mr-3 text-gray"><i class="fab fa-dropbox"></i></div> -->
                             <div class="text">
-                                <h6 class="mb-0 d-flex align-items-center"> <span><a href="/purchaseorder/editpurchaseorder/{{purchaseorder.purchasereq.id}}/{{purchaseorder.poid}}">{{purchaseorder.title}}</a></span>
+                                <h6 class="mb-0 d-flex align-items-center"> <span><a
+                                            href="/purchaseorder/editpurchaseorder/{{purchaseorder.purchasereq.id}}/{{purchaseorder.poid}}">{{purchaseorder.title}}</a></span>
                                     <!-- <span class="dot dot-sm ml-2 bg-violet"></span> -->
-                                </h6><small class="text-gray">{{purchaseorder.purchasereq.actual_amount}} THB</small>
+                                </h6><small class="text-gray">{{purchaseorder.purchasereq.actual_amount}} THB </small>
+                                {% if purchaseorder.status.id == 2 %}
+                                <span><button type="button"
+                                        onclick= 'window.open("/purchaseorder/generatepdf/{{purchaseorder.poid}}","_blank")'
+                                        class="btn xls btn-default"><i class="glyphicon glyphicon-download-alt"></i>&nbsp;export to pdf</button></span>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="right ml-5 ml-sm-0 pl-3 pl-sm-0">
@@ -34,7 +40,8 @@
                                     {% if purchaseorder.status.id == 1 %}
                                     <div class="dot mr-3 bg-violet"></div>
                                     <div class="text text-violet">
-                                        <h6 class="mb-0">{{purchaseorder.status.name}} for {{purchaseorder.foruser}}</h6>
+                                        <h6 class="mb-0">{{purchaseorder.status.name}} for {{purchaseorder.foruser}}
+                                        </h6>
                                     </div>
                                     {% elif purchaseorder.status.id == 2 %}
                                     <div class="dot mr-3 bg-green"></div>
