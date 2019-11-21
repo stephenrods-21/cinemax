@@ -13,6 +13,7 @@ import os
 from django.template.loader import get_template
 from django.template import Context
 import pdfkit
+import pydf
 
 # Create your views here.
 
@@ -233,21 +234,31 @@ def generate_pdf(request, poid):
     for item in purchase_order_items:
         grand_total = grand_total + item.amount
 
-    template = get_template("pdf/invoice.htm")
-    model = {
-        'purchase_order': purchase_order,
-        'purchase_order_items': purchase_order_items,
-        'grand_total': grand_total
-    }
-    html = template.render(model)
-    pdf = pdfkit.from_string(html, False)
+    
+    pdf = pydf.generate_pdf('<h1>this is html</h1>')
+    with open('out.pdf', 'wb') as f:
+        f.write(pdf)
+    
+    response = HttpResponse(pdf, content_type='application/pdf')
+    return response
+
+    # template = get_template("pdf/invoice.htm")
+    # model = {
+    #     'purchase_order': purchase_order,
+    #     'purchase_order_items': purchase_order_items,
+    #     'grand_total': grand_total
+    # }
+    # html = template.render(model)
+    # pdf = pdfkit.from_string(html, False)
+    # response = HttpResponse(pdf, content_type='application/pdf')
+    # return response
+
+
     # pdf = open("out.pdf", encoding="utf8")
     # response = HttpResponse(pdf.read(), content_type='application/pdf')
     # response['Content-Disposition'] = 'attachment; filename=output.pdf'
     # pdf.close()
     # os.remove("out.pdf")
-    response = HttpResponse(pdf, content_type='application/pdf')
-    return response
 
     # return Render.render('pdf/invoice.htm', {})
 
