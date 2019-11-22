@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import json
 from django.db.models import Q, Sum
-from cinemaxpr.models import PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, PurchaseOrderDetail, PurchaseOrderLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, ApprovalStatus, TransactionDetail
+from cinemaxpr.models import MemoDetail, PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, PurchaseOrderDetail, PurchaseOrderLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, ApprovalStatus, TransactionDetail
 from cinemax.enums import Status
 from .viewmodels import purchase_order_vm
 from django.core.mail import send_mail
@@ -108,12 +108,21 @@ def editpurchaseorder(request, id, poid):
             lineOfApprovalDetail = LineOfApprovalDetail.objects.filter(
                 line_of_approval_id=lineOfApproval.id, level=1, entity_type_id=2)
 
+            # Get PR reference
+            purchaserequisition = PurchaseRequisitionDetail.objects.get(id=request.POST['prid'])
+            #Get Memo by budget id
+            memo_id = 0
+            memo_detail = MemoDetail.objects.get(budget_id=purchaserequisition.budgetDetail.id)
+            if memo_detail:
+                memo_id = memo_detail.id
+            
             # from level 1 make entry in transactions table for LOA
             for loaDetail in lineOfApprovalDetail:
                 transaction = TransactionDetail(level=loaDetail.level, required_approval=loaDetail.required_approval,
                                                 businessunitObj=lineOfApproval.businessunit_id,
                                                 lineOfApprovalObj=lineOfApproval.id,
                                                 entity_type_id=2,
+                                                memoObj_id=memo_id,
                                                 extendeduserObj=loaDetail.approver_id,
                                                 purchaseOrderDetail_id=purchaseorder.id,
                                                 transactionstatus=Status.PENDING.value)
@@ -153,12 +162,16 @@ def updatePOTransactionStatus(request, tid, isApproved):
             po.status_id = Status.REJECTED.value
             po.save()
 
+            #get memo requester
+            memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
+            memo_requester = ExtendedUser.objects.get(user_id=memo_detail.created_by_id)
+            
             extendeduser = ExtendedUser.objects.get(user_id=po.created_by_id)
             subject = 'Purchase Order Rejected'
             message = settings.REJECTED_EMAIL_TEMPLATE.format(
                 extendeduser.user.username, po.title)
             email_from = settings.EMAIL_HOST_USER
-            recipient_list = [extendeduser.email]
+            recipient_list = [extendeduser.email, memo_requester.email]
             send_mail(subject, message, email_from, recipient_list)
             print("REJECTED")
             return HttpResponse(json.dumps({'status': "Rejected"}), content_type="application/json")
@@ -195,6 +208,7 @@ def updatePOTransactionStatus(request, tid, isApproved):
                                                        businessunitObj=transaction.businessunitObj,
                                                        purchaseOrderDetail_id=transaction.purchaseOrderDetail_id,
                                                        entity_type_id=2,
+                                                       memoObj_id=transaction.memoObj_id,
                                                        transactionstatus=Status.PENDING.value)
                 transaction_detail.save()
         else:
@@ -204,6 +218,10 @@ def updatePOTransactionStatus(request, tid, isApproved):
             purchaseorder.status_id = Status.APPROVED.value
             purchaseorder.save()
 
+            #get memo requester
+            memo_detail = MemoDetail.objects.get(id=transaction.memoObj_id)
+            memo_requester = ExtendedUser.objects.get(user_id=memo_detail.created_by_id)
+
             extendeduser = ExtendedUser.objects.get(
                 user_id=purchaseorder.created_by_id)
 
@@ -211,7 +229,7 @@ def updatePOTransactionStatus(request, tid, isApproved):
             message = settings.APPROVED_EMAIL_TEMPLATE.format(
                 extendeduser.user.username, purchaseorder.title)
             email_from = settings.EMAIL_HOST_USER
-            recipient_list = [extendeduser.email]
+            recipient_list = [extendeduser.email, memo_requester.email]
             print(message, extendeduser.email)
             send_mail(subject, message, email_from, recipient_list)
 
