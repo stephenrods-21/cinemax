@@ -24,4 +24,3 @@ whitenoise==4.1.4
 wkhtmltopdf==0.2
 wrapt==1.11.2
 xhtml2pdf==0.2.3
-wkhtmltopdf-pack-ng==0.12.3.0
