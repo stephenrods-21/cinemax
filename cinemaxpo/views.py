@@ -168,8 +168,7 @@ def updatePOTransactionStatus(request, tid, isApproved):
             
             extendeduser = ExtendedUser.objects.get(user_id=po.created_by_id)
             subject = 'Purchase Order Rejected'
-            message = settings.REJECTED_EMAIL_TEMPLATE.format(
-                extendeduser.user.username, po.title)
+            message = settings.REJECTED_EMAIL_TEMPLATE.format(po.title)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email, memo_requester.email]
             send_mail(subject, message, email_from, recipient_list)
@@ -226,8 +225,7 @@ def updatePOTransactionStatus(request, tid, isApproved):
                 user_id=purchaseorder.created_by_id)
 
             subject = "Purchase Order Approved By CEO"
-            message = settings.APPROVED_EMAIL_TEMPLATE.format(
-                extendeduser.user.username, purchaseorder.title)
+            message = settings.APPROVED_EMAIL_TEMPLATE.format(purchaseorder.title)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email, memo_requester.email]
             print(message, extendeduser.email)

@@ -266,8 +266,7 @@ def updatePRTransactionStatus(request, tid, isApproved):
             extendeduser = ExtendedUser.objects.get(
                 user_id=pr_detail.created_by_id)
             subject = 'PR Rejected'
-            message = settings.REJECTED_EMAIL_TEMPLATE.format(
-                extendeduser.user.username, pr_detail.title)
+            message = settings.REJECTED_EMAIL_TEMPLATE.format(pr_detail.title)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email]
             send_mail(subject, message, email_from, recipient_list)
@@ -315,8 +314,7 @@ def updatePRTransactionStatus(request, tid, isApproved):
                 user_id=pr_details.created_by_id)
 
             subject = "PR Approved By CEO"
-            message = settings.APPROVED_EMAIL_TEMPLATE.format(
-                extendeduser.user.username, pr_details.title)
+            message = settings.APPROVED_EMAIL_TEMPLATE.format(pr_details.title)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email]
             print(message, extendeduser.email)
@@ -349,8 +347,7 @@ def updateTransactionStatus(request, tid, isApproved):
 
             extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
             subject = 'Memo Rejected'
-            message = settings.REJECTED_EMAIL_TEMPLATE.format(
-                extendeduser.user.username, memo.topic)
+            message = settings.REJECTED_EMAIL_TEMPLATE.format(memo.topic)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email]
             send_mail(subject, message, email_from, recipient_list)
@@ -397,8 +394,7 @@ def updateTransactionStatus(request, tid, isApproved):
             extendeduser = ExtendedUser.objects.get(user_id=memo.created_by_id)
 
             subject = "Memo Approved By CEO"
-            message = settings.APPROVED_EMAIL_TEMPLATE.format(
-                extendeduser.user.username, memo.topic)
+            message = settings.APPROVED_EMAIL_TEMPLATE.format(memo.topic)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [extendeduser.email]
             print(message, extendeduser.email)
