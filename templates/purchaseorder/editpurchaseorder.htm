@@ -144,6 +144,13 @@
                                     {% endfor %}
                                     <tr id='addrpoline{{line_items | length | add:1}}' data-indx="{{line_items | length | add:1}}" class="po-pr-line-item"></tr>
                                 </tbody>
+                                <tfoot>
+                                        <tr>
+                                            <td colspan="2"></td>
+                                            <td colspan="">GRAND TOTAL</td>
+                                            <td>THB <span id="GrandTotal">{{grand_total}}</span></td>
+                                        </tr>
+                                    </tfoot>
                             </table>
                         </div>
                     </div>

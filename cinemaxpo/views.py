@@ -1,5 +1,6 @@
 from django.shortcuts import render
 import json
+from django.db.models import Q, Sum
 from cinemaxpr.models import PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, PurchaseOrderDetail, PurchaseOrderLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, ApprovalStatus, TransactionDetail
 from cinemax.enums import Status
 from .viewmodels import purchase_order_vm

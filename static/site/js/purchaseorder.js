@@ -1,8 +1,8 @@
 $(document).ready(() => {
+    calculatetotal();
 
     var i = 0;
     $("#add_row_po_line").click(function () {
-        debugger
         lastIdx = parseInt($(this).attr('data-last-indx'));
         newIndx = lastIdx + 1;
         $(this).attr('data-last-indx', newIndx);
@@ -101,10 +101,22 @@ $(document).ready(() => {
                     $(this).closest('tr').find('.amount').val(data.amount);
                     $(this).closest('tr').find('.quantity').val(1);
                     $(this).closest('tr').find('.price').val(data.amount);
+                    calculatetotal();
                 }
             });
         }
     })
+
+    function calculatetotal() {
+        var grandTotal = 0;
+        $('.po-pr-line-item').each((idx, elm) => {
+            var lineamount = $(elm).find('[name="lineamount"]').val();
+            if (lineamount != undefined) {
+                grandTotal += parseFloat(lineamount);
+            }
+        });
+        $('#GrandTotal').text(grandTotal);
+    }
 
     $(document).on('click', '.approve-po-request', function (e) {
         $(this).attr('disabled', true);

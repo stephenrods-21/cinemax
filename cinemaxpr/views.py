@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Sum
 from cinemaxpr.models import businessunit, MemoDetail, BudgetDetail, AttachmentDetail, PurchaseRequisitionDetail, PurchaseRequisitionLineDetail, LineOfApproval, LineOfApprovalDetail, ExtendedUser, Role, ApprovalStatus, TransactionDetail
 import json
 import os
