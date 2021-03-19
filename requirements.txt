@@ -1,7 +1,7 @@
 astroid==2.3.3
 autopep8==1.4.4
 colorama==0.4.1
-Django==2.2.7
+Django==2.2.18
 gunicorn==19.9.0
 html5lib==1.0.1
 isort==4.3.21
