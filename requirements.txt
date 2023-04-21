@@ -18,7 +18,7 @@ python-pdf==0.37
 pytz==2019.3
 reportlab==3.5.32
 six==1.13.0
-sqlparse==0.3.0
+sqlparse==0.4.4
 webencodings==0.5.1
 whitenoise==4.1.4
 wkhtmltopdf==0.2
