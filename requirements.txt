@@ -13,7 +13,7 @@ pycodestyle==2.5.0
 pylint==2.4.3
 pylint-django==2.0.12
 pylint-plugin-utils==0.6
-PyPDF2==1.26.0
+PyPDF2==1.27.9
 python-pdf==0.37
 pytz==2019.3
 reportlab==3.5.32
